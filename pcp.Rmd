@@ -1,0 +1,35 @@
+---
+title: "Maine Primary Care Providers"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Load Packages
+
+```{r libraries, echo = FALSE}
+
+library(tidyverse)
+library(readr)
+library(leaflet)
+library(dplyr)
+
+```
+
+## Data Import
+
+```{r data import, echo = FALSE}
+
+# read csv
+
+pcp_df <- read_csv("data/maine_primary_care.csv")
+
+# glimpse data
+
+glimpse(pcp_df)
+
+```
+
+
