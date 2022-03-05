@@ -1,0 +1,64 @@
+---
+title: "Primary Care Provider Leaflet"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Leaflet Map
+
+```{r pcp-leaflet}
+
+# load libraries
+library(leaflet)
+library(tidyverse)
+library(htmlwidgets)
+
+# make leaflet icons 
+maine_icons <- awesomeIconList(
+  "doctor" = makeAwesomeIcon(icon = "user-md", library = "fa", markerColor = "lightred"),
+  "family practice physician" = makeAwesomeIcon(icon = "users", library = "fa", markerColor = "green"),
+  "medical clinic" = makeAwesomeIcon(icon = "plus-square", library = "fa", markerColor = "beige"),
+  "medical office" = makeAwesomeIcon(icon = "plus-square", library = "fa", markerColor = "blue"),
+  "medical group" = makeAwesomeIcon(icon = "plus-square", library = "fa", markerColor = "purple"),
+  "internist"  = makeAwesomeIcon(icon = "user-md", library = "fa", markerColor = "orange")
+)
+
+# make popup text with name, address, notes, and link to website
+maine_popup <-
+  pcp_df %>% 
+  mutate(popup = paste("<b><a href='", website,"'>", title,"</a></b>", "<br/>",
+                       address))
+
+# setup basemap
+pcp_leaflet <- 
+  leaflet() %>% 
+  addTiles()
+
+
+names(maine_icons) %>%                     
+  walk(function(x)                     
+    pcp_leaflet <<- 
+      pcp_leaflet %>% addAwesomeMarkers(
+      pcp_df$longitude,
+      pcp_df$latitude,
+      data = filter(pcp_df, category == x),
+      group = x,                           
+      icon = maine_icons[[x]],
+      popup = ~pcp_df$popup))
+
+# add layer controls to map 
+pcp_leaflet <- 
+  pcp_leaflet %>% 
+  addLayersControl(
+    overlayGroups = names(maine_icons),
+    options = layersControlOptions(collapsed = FALSE)
+  )
+
+# save widget 
+saveWidget(pcp_leaflet, "maine_pcp.html")
+```
+
+
