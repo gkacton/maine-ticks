@@ -23,15 +23,14 @@ library(icons)
 ```{r data import, echo = FALSE}
 
 # read csv
-
 pcp_df <- read_csv("data/maine_primary_care.csv")
 
 ```
 
 
-```{r pcp-leaflet-method-0}
+```{r primary-care-provider-leaflet}
 
-maine_icons0 <- awesomeIconList(
+maine_icons <- awesomeIconList(
   `Doctor` = makeAwesomeIcon(
   icon = "user-md",
   library = "fa",
@@ -73,7 +72,7 @@ maine_icons0 <- awesomeIconList(
   markerColor = "pink"
 ),
   `Home health care service` = makeAwesomeIcon(
-  icon = "user-md",
+  icon = "home",
   library = "fa",
   markerColor = "yellow"
 ),
@@ -91,6 +90,16 @@ maine_icons0 <- awesomeIconList(
   icon = "medkit",
   library = "fa",
   markerColor = "purple"
+),
+  `Podiatrist` = makeAwesomeIcon(
+  icon =  "user-md",
+  library = "fa",
+  markerColor = "teal"
+),
+  `Children's hospital` = makeAwesomeIcon(
+  icon =  "h-square",
+  library = "fa",
+  markerColor = "white"
 )
 )
 
@@ -123,11 +132,8 @@ pcp_leaflet <-
       ~longitude,
       ~latitude,
       popup = ~labels,
-      icon = ~maine_icons0[category], 
+      icon = ~maine_icons[category], 
       group = ~category)
-
-
-
 
 # add layer controls to map 
 pcp_leaflet <- 
