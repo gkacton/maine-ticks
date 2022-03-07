@@ -15,29 +15,97 @@ knitr::opts_chunk$set(echo = TRUE)
 library(leaflet)
 library(tidyverse)
 library(htmlwidgets)
+library(fontawesome)
+library(icons)
 
 
 # make leaflet icons 
+maine_icons_test <- awesomeIconList(
+  `Doctor` = makeAwesomeIcon(icon = "fish", library = "fa", markerColor = "lightred"),
+  `Family practice physician` = makeAwesomeIcon(icon = "fish", library = "fa", markerColor = "green"),
+  `Medical clinic` = makeAwesomeIcon(icon = "fish", library = "fa", markerColor = "beige"),
+  `Medical office` = makeAwesomeIcon(icon = "fish", library = "fa", markerColor = "blue"),
+  `Medical group` = makeAwesomeIcon(icon = "fish", library = "fa", markerColor = "purple"),
+  `Internist`  = makeAwesomeIcon(icon = "fish", library = "fa", markerColor = "orange"),
+  `Medical cCenter` = makeAwesomeIcon(icon = "fish", library = "fa", markerColor = "lightred"),
+  `Reproductive health clinic` = makeAwesomeIcon(icon = "heart", library = "fa", markerColor = "pink"),
+  `Home health care service` = makeAwesomeIcon(icon = "fish", library = "fa", markerColor = "yellow"),
+  `General practitioner` = makeAwesomeIcon(icon = "fish", library = "fa", markerColor = "beige"),
+  `Hospital` = makeAwesomeIcon(icon = "fish", library = "fa", markerColor = "orange"),
+  `Emergency care physician`  = makeAwesomeIcon(icon = "fish", library = "fa", markerColor = "purple"))  
+
 maine_icons0 <- awesomeIconList(
-  `doctor` = makeAwesomeIcon(icon = "user-md", library = "fa", markerColor = "lightred"),
-  `family practice physician` = makeAwesomeIcon(icon = "users", library = "fa", markerColor = "green"),
-  `medical clinic` = makeAwesomeIcon(icon = "plus-square", library = "fa", markerColor = "beige"),
-  `medical office` = makeAwesomeIcon(icon = "plus-square", library = "fa", markerColor = "blue"),
-  `medical group` = makeAwesomeIcon(icon = "plus-square", library = "fa", markerColor = "purple"),
-  `internist`  = makeAwesomeIcon(icon = "user-md", library = "fa", markerColor = "orange"),
-  `medical center` = makeAwesomeIcon(icon = "plus-square", library = "fa", markerColor = "lightred"),
-  `reproductive health clinic` = makeAwesomeIcon(icon = "heart", library = "fa", markerColor = "pink"),
-  `home health care service` = makeAwesomeIcon(icon = "home", library = "fa", markerColor = "yellow"),
-  `general practitioner` = makeAwesomeIcon(icon = "user-md", library = "fa", markerColor = "beige"),
-  `hospital` = makeAwesomeIcon(icon = "h-square", library = "fa", markerColor = "orange"),
-  `emergency care physician`  = makeAwesomeIcon(icon = "medkit", library = "fa", markerColor = "purple")
+  `Doctor` = makeAwesomeIcon(
+  icon = "user-md",
+  library = "fa",
+  markerColor = "lightred"
+),
+  `Family practice physician` = makeAwesomeIcon(
+  icon = "users",
+  library = "fa",
+  markerColor = "green"
+),
+  `Medical clinic` = makeAwesomeIcon(
+  icon = "plus-square",
+  library = "fa",
+  markerColor = "beige"
+),
+  `Medical office` = makeAwesomeIcon(
+  icon = "plus-square",
+  library = "fa",
+  markerColor = "blue"
+),
+  `Medical group` = makeAwesomeIcon(
+  icon = "plus-square",
+  library = "fa",
+  markerColor = "purple"
+),
+  `Internist`  = makeAwesomeIcon(
+  icon = "user-md",
+  library = "fa",
+  markerColor = "orange"
+),
+  `Medical Center` = makeAwesomeIcon(
+  icon = "plus-square",
+  library = "fa",
+  markerColor = "lightred"
+),
+  `Reproductive health clinic` = makeAwesomeIcon(
+  icon = "heart",
+  library = "fa",
+  markerColor = "pink"
+),
+  `Home health care service` = makeAwesomeIcon(
+  icon = "user-md",
+  library = "fa",
+  markerColor = "yellow"
+),
+  `General practitioner` = makeAwesomeIcon(
+  icon = "user-md",
+  library = "fa",
+  markerColor = "beige"
+),
+  `Hospital` = makeAwesomeIcon(
+  icon = "h-square",
+  library = "fa",
+  markerColor = "orange"
+),
+  `Emergency care physician` = makeAwesomeIcon(
+  icon = "medkit",
+  library = "fa",
+  markerColor = "purple"
+)
 )
 
 # make popup text with name, address, notes, and link to website
 pcp_df <-
   pcp_df %>% 
-  mutate(popup = paste("<b><a href='", website,"'>", title,"</a></b>", "<br/>",
-                       address, "<br/><strong>Rating:</strong>",  rating, "/ 5"))
+  mutate(full_website = paste("<b><a href='", website,"'>", title,"</a></b>", "<br/>", sep = "")) 
+
+labels <- sprintf(
+  "<strong>%s</strong><br/>Website: %s<br/>Rating out of 5: %s",
+  pcp_df$title, pcp_df$full_website, pcp_df$rating
+) %>% lapply(htmltools::HTML)
 
 # setup basemap
 pcp_leaflet <- 
@@ -47,21 +115,25 @@ pcp_leaflet <-
              ~pcp_df$latitude, 
              data = pcp_df, 
              group = pcp_df$category, 
-             popup = ~pcp_df$popup)
+             popup = ~labels)
   
 
-#names(maine_icons0) %>%                     
-#  walk(function(x)                     
-#    pcp_leaflet <<- 
-#      pcp_leaflet %>% addAwesomeMarkers(
-#      ~pcp_df$longitude,
-#      ~pcp_df$latitude,
-#      data = filter(pcp_df, category == x),
-#      group = x,                           
-#      icon = maine_icons0[[x]],
-#      popup = ~pcp_df$popup))
+pcp_leaflet <- 
+      leaflet(data = pcp_df) %>%
+      addTiles() %>% addAwesomeMarkers(
+      ~longitude,
+      ~latitude,
+      popup = ~labels,
+      icon = ~maine_icons0[category], 
+      group = ~category)
 
 
+
+icon1 <- makeAwesomeIcon(
+  icon = "medkit",
+  library = "fa",
+  markerColor = "beige"
+)
 # add layer controls to map 
 pcp_leaflet <- 
   pcp_leaflet %>% 
