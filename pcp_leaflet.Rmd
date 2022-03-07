@@ -9,7 +9,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Leaflet Map
 
-```{r pcp-leaflet-method-0}
+```{r load-libraries}
 
 # load libraries
 library(leaflet)
@@ -17,22 +17,19 @@ library(tidyverse)
 library(htmlwidgets)
 library(fontawesome)
 library(icons)
+```
 
 
-# make leaflet icons 
-maine_icons_test <- awesomeIconList(
-  `Doctor` = makeAwesomeIcon(icon = "fish", library = "fa", markerColor = "lightred"),
-  `Family practice physician` = makeAwesomeIcon(icon = "fish", library = "fa", markerColor = "green"),
-  `Medical clinic` = makeAwesomeIcon(icon = "fish", library = "fa", markerColor = "beige"),
-  `Medical office` = makeAwesomeIcon(icon = "fish", library = "fa", markerColor = "blue"),
-  `Medical group` = makeAwesomeIcon(icon = "fish", library = "fa", markerColor = "purple"),
-  `Internist`  = makeAwesomeIcon(icon = "fish", library = "fa", markerColor = "orange"),
-  `Medical cCenter` = makeAwesomeIcon(icon = "fish", library = "fa", markerColor = "lightred"),
-  `Reproductive health clinic` = makeAwesomeIcon(icon = "heart", library = "fa", markerColor = "pink"),
-  `Home health care service` = makeAwesomeIcon(icon = "fish", library = "fa", markerColor = "yellow"),
-  `General practitioner` = makeAwesomeIcon(icon = "fish", library = "fa", markerColor = "beige"),
-  `Hospital` = makeAwesomeIcon(icon = "fish", library = "fa", markerColor = "orange"),
-  `Emergency care physician`  = makeAwesomeIcon(icon = "fish", library = "fa", markerColor = "purple"))  
+```{r data import, echo = FALSE}
+
+# read csv
+
+pcp_df <- read_csv("data/maine_primary_care.csv")
+
+```
+
+
+```{r pcp-leaflet-method-0}
 
 maine_icons0 <- awesomeIconList(
   `Doctor` = makeAwesomeIcon(
@@ -100,12 +97,14 @@ maine_icons0 <- awesomeIconList(
 # make popup text with name, address, notes, and link to website
 pcp_df <-
   pcp_df %>% 
-  mutate(full_website = paste("<b><a href='", website,"'>", title,"</a></b>", "<br/>", sep = "")) 
+  mutate(full_website = paste("<b><a href='https://www.", website,"' target='_blank'>", title,"</a></b>", "<br/>", sep = "")) 
 
+# make popup text with name, address, notes, and link to website
 labels <- sprintf(
-  "<strong>%s</strong><br/>Website: %s<br/>Rating out of 5: %s",
-  pcp_df$title, pcp_df$full_website, pcp_df$rating
+  "<strong>%s</strong><br/>%s<br/><strong>Rating: %g of 5</strong>",
+  pcp_df$full_website, pcp_df$address, pcp_df$rating
 ) %>% lapply(htmltools::HTML)
+
 
 # setup basemap
 pcp_leaflet <- 
@@ -129,11 +128,7 @@ pcp_leaflet <-
 
 
 
-icon1 <- makeAwesomeIcon(
-  icon = "medkit",
-  library = "fa",
-  markerColor = "beige"
-)
+
 # add layer controls to map 
 pcp_leaflet <- 
   pcp_leaflet %>% 
@@ -144,8 +139,6 @@ pcp_leaflet <-
 
 # save widget 
 saveWidget(pcp_leaflet, "maine_pcp.html")
-
-# pcp_leaflet
 
 ```
 
