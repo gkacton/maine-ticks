@@ -1,0 +1,83 @@
+---
+title: "Population and Age of Maine Cities"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Load Packages
+
+```{r libraries, echo = FALSE}
+
+library(tidyverse) 
+library(leaflet) 
+library(sf) 
+library(RColorBrewer) 
+library(htmltools) 
+library(leafsync) 
+library(kableExtra) 
+
+```
+
+# Import and Clean Data
+
+```{r data-import, echo = FALSE}
+
+# read shape file
+me_spatial <- st_read("data/demographics/spatial/tl_2016_23_place.shp")
+
+```
+
+```{r change-coordinate-reference-system, echo = FALSE}
+
+# change CRS
+me_spatial <- st_transform(me_spatial, "+init=epsg:4326")
+
+# report new CRS
+st_crs(me_spatial)
+```
+
+# Generate Leaflet
+
+```{r generate-leaflet-basemap, echo = FALSE}
+
+# set view and add texture
+me_spatial_bm <- leaflet(data = me_spatial) %>% #<<
+  addProviderTiles(providers$Stamen.Terrain) %>%
+  setView(lng = -69.5, 
+          lat = 45.3, 
+          zoom = 6.5)
+
+# add city borders
+me_spatial_bm %>%
+  addPolygons(
+    opacity = 1,
+    color = "blue", 
+    weight = 2) 
+```
+
+```{r generate-leaflet-labels, echo = FALSE}
+
+# create labels
+agepop_labels <- sprintf("<strong>%s</strong><br/>geoid # %s ", 
+                  me_spatial$NAME, me_spatial$GEOID) %>% lapply(htmltools::HTML)
+
+```
+
+
+```{r first-leaflet-map1j, eval=TRUE}
+me_spatial_map <- me_spatial_bm %>%
+  addPolygons(
+      color = "blue", 
+      opacity = 1,
+      weight = 2,
+    highlight = highlightOptions( #<<
+        weight = 3, #<<
+        color = "green", #<<
+        fillOpacity = 1, #<<
+        bringToFront = TRUE)) #<< 
+
+me_spatial_map
+```
