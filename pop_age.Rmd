@@ -1,0 +1,22 @@
+---
+title: "Population and Age of Maine Cities"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Load Packages
+
+```{r libraries, echo = FALSE}
+
+library(tidyverse) 
+library(leaflet) 
+library(sf) 
+library(RColorBrewer) 
+library(htmltools) 
+library(leafsync) 
+library(kableExtra) 
+
+```
