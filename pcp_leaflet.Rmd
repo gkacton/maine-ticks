@@ -109,7 +109,7 @@ pcp_df <-
   mutate(full_website = paste("<b><a href='https://www.", website,"' target='_blank'>", title,"</a></b>", "<br/>", sep = "")) 
 
 # make popup text with name, address, notes, and link to website
-labels <- sprintf(
+pcp_labels <- sprintf(
   "<strong>%s</strong><br/>%s<br/><strong>Rating: %g of 5</strong>",
   pcp_df$full_website, pcp_df$address, pcp_df$rating
 ) %>% lapply(htmltools::HTML)
@@ -123,7 +123,7 @@ pcp_leaflet <-
              ~pcp_df$latitude, 
              data = pcp_df, 
              group = pcp_df$category, 
-             popup = ~labels)
+             popup = ~pcp_labels)
   
 
 pcp_leaflet <- 
@@ -131,7 +131,7 @@ pcp_leaflet <-
       addTiles() %>% addAwesomeMarkers(
       ~longitude,
       ~latitude,
-      popup = ~labels,
+      popup = ~pcp_labels,
       icon = ~maine_icons[category], 
       group = ~category)
 
