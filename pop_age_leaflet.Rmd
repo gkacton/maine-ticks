@@ -18,6 +18,7 @@ library(RColorBrewer)
 library(htmltools) 
 library(leafsync) 
 library(kableExtra) 
+library(tidycensus)
 
 ```
 
@@ -32,12 +33,8 @@ me_counties <- st_read("data/demographics/spatial/counties/Maine_County_Boundary
 # read csv file
 me_pop <- read_csv("data/demographics/maine_city_population.csv")
 
-
-# merge data
-me_pop %>% rename(NAME = name)
-
-me_spatial <- me_spatial %>%
-  merge(me_spatial, me_pop, by="NAME")
+me_spatial <- me_cities %>%
+  left_join(me_pop, by= "NAME")
 
 
   
@@ -50,6 +47,8 @@ me_spatial <- me_spatial %>%
 # change CRS
 me_cities <- st_transform(me_cities, "+init=epsg:4326")
 me_counties <- st_transform(me_counties, "+init=epsg:4326")
+
+me_spatial <- st_transform(me_spatial, "+init=epsg:4326")
 
 # report new CRS
 st_crs(me_cities)
@@ -141,3 +140,14 @@ me_counties_map <- me_counties_bm %>%
         bringToFront = TRUE)) #<< 
 
 me_counties_map
+```
+
+
+
+```{r census-data}
+
+census_api_key("5177724b01a7fe4714097e711cb95230c37cfce7", install = TRUE, overwrite = TRUE)
+
+```
+
+
