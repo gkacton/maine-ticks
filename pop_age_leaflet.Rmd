@@ -20,6 +20,9 @@ library(leafsync)
 library(kableExtra) 
 library(tidycensus)
 library(rvest)
+library(DT)
+library(fedmatch)
+
 
 ```
 
@@ -172,6 +175,13 @@ ggplot(census_df) +
 
 census_df <- st_transform(census_df, "+init=epsg:4326")
 
+tick_census_df <- tick_towns %>%
+  left_join(census_df, by = c("town" = "Place"))
+
+anti_join(tick_towns, census_df, by = c("town" = "Place"))
+
+mismatches <- anti_join(census_df, tick_towns, by = c("Place" = "town"))
+
 pop_age_labels <- sprintf(
   "<strong>%s (2019)</strong> <br/>Population: %g",
    census_df$Place, census_df$estimate
@@ -191,7 +201,49 @@ leaflet(census_df) %>%
 ```
 
 
+```{r tick-towns-missing-from-census-data, echo = FALSE}
+
+missing_ticktown <- anti_join(tick_towns, census_df, by = c("town" = "Place")) %>%
+                    select(town, borrelia_positive, borrelia_tests)
+
+DT::datatable(missing_ticktown,
+              options = list(
+                paging = TRUE,
+                pageLength = 10),
+              height = 500)
+              
+```
 
 
+```{r census-towns-missing-from-tick-data, echo = FALSE}
 
+missing_censustown <- anti_join(census_df, tick_towns, by = c("Place" = "town")) %>%
+                      select(Place, estimate, moe)
 
+DT::datatable(missing_censustown,
+              options = list(
+                paging = TRUE,
+                pageLength = 10),
+              height = 500)
+              
+```
+
+```{r fuzzy-match, echo = FALSE}
+
+tick_towns$row_num <- seq.int(nrow(tick_towns)) 
+
+fuzzy_result <- merge_plus(data1 = census_df, data2 = tick_towns,
+                           by.x = "Place", by.y = "town",
+                           match_type = "fuzzy",
+                           fuzzy_settings = build_fuzzy_settings(
+                             p = 0.1,
+                             maxDist = 0.15),
+                           unique_key_1 = "GEOID", unique_key_2 = "row_num")
+
+DT::datatable(fuzzy_result[[1]],
+              options = list(
+                paging = TRUE,
+                pageLength = 10),
+              height = 500)
+              
+```
