@@ -19,6 +19,7 @@ library(htmltools)
 library(leafsync) 
 library(kableExtra) 
 library(tidycensus)
+library(rvest)
 
 ```
 
@@ -36,8 +37,6 @@ me_pop <- read_csv("data/demographics/maine_city_population.csv")
 me_spatial <- me_cities %>%
   left_join(me_pop, by= "NAME")
 
-
-  
 
 
 ```
@@ -157,6 +156,12 @@ census_api_key("5177724b01a7fe4714097e711cb95230c37cfce7", install = TRUE, overw
 
 census_df <- get_acs(geography = "place", variables = c("B01003_001E"), state = "ME", geometry = TRUE)
 
+census_df <- census_df %>%
+  separate(NAME, into = c("Place", "State"), sep = ",") %>%
+  mutate(Place = str_remove(Place, " CDP| city"))
+
+
+  
 ggplot(census_df) +
     geom_sf(aes(fill = estimate))
 
@@ -166,7 +171,12 @@ ggplot(census_df) +
 
 census_df <- st_transform(census_df, "+init=epsg:4326")
 
-bins <- seq(0, 10000, by = 500)
+pop_age_labels <- sprintf(
+  "<strong>%s (2019)</strong> <br/>Population: %g",
+   census_df$Place, census_df$estimate
+) %>% lapply(htmltools::HTML)
+
+bins <- seq(0, 80000, by = 10000)
 pal <- colorBin("OrRd", domain = census_df$estimate, bins = bins)
 leaflet(census_df) %>%
   addProviderTiles(providers$Stamen.Terrain) %>%
@@ -174,7 +184,8 @@ leaflet(census_df) %>%
   addPolygons(fillColor = ~pal(census_df$estimate),
               color = "black",
               weight = 1,
-              fillOpacity = 0.9)
+              fillOpacity = 0.9,
+              label = ~pop_age_labels)
 
 ```
 
