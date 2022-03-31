@@ -160,14 +160,24 @@ census_api_key("5177724b01a7fe4714097e711cb95230c37cfce7", install = TRUE, overw
 
 # import census data
 census_df <- get_acs(geography = "place", variables = c("B01003_001E"), state = "ME", geometry = TRUE)
+census_df2 <- get_acs(geography = "county subdivision", variables = c("B01003_001E"), state = "ME", geometry = TRUE)
 
 # reformat location variables
 census_df <- census_df %>%
   separate(NAME, into = c("Place", "State"), sep = ",") %>%
   mutate(Place = str_remove(Place, " CDP| city"))
 
+# reformat location variables
+census_df2 <- census_df2 %>%
+  separate(NAME, into = c("Place", "County", "State"), sep = ",") %>%
+  mutate(Place = str_remove(Place, "town"))
+
 # visualize polygons using ggplot
 ggplot(census_df) +
+    geom_sf(aes(fill = estimate))
+
+# visualize polygons using ggplot
+ggplot(census_df2) +
     geom_sf(aes(fill = estimate))
 
 ```
@@ -176,6 +186,7 @@ ggplot(census_df) +
 
 # set CRS
 census_df <- st_transform(census_df, "+init=epsg:4326")
+census_df2 <- st_transform(census_df, "+init=epsg:4326")
 
 # join tick data with census data
 tick_census_df <- tick_towns %>%
