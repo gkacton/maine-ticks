@@ -16,14 +16,14 @@ library(leaflet)
 library(tidyverse)
 library(htmlwidgets)
 library(fontawesome)
-library(icons)
+#library(icons)
 ```
 
 
 ```{r data import, echo = FALSE}
 
 # read csv
-pcp_df <- read_csv("data/maine_primary_care.csv")
+pcp_df <- read_csv("data/primary care providers/maine_primary_care.csv")
 
 ```
 
