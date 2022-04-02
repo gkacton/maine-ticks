@@ -26,171 +26,91 @@ library(rvest)
 library(DT)
 library(fedmatch)
 
-
 ```
 
 # Import and Clean Data
 
 ```{r data-import, echo = FALSE}
 
-# read shape files
-me_cities <- st_read("data/demographics/spatial/cities/tl_2016_23_place.shp")
-
 # read csv files
-me_pop <- read_csv("data/demographics/maine_city_population.csv")
 tick_towns <- read_csv("/cloud/project/data/ticks/tickborne_prevalence_town.csv")
 
-# join population data with spatial data
-me_spatial <- me_cities %>%
-  left_join(me_pop, by= "NAME")
-
-```
-
-```{r change-coordinate-reference-system, echo = FALSE}
-
-# set CRS
-me_cities <- st_transform(me_cities, "+init=epsg:4326")
-me_spatial <- st_transform(me_spatial, "+init=epsg:4326")
-
-# report CRS
-st_crs(me_cities)
-st_crs(me_spatial)
-
-```
-
-# Cities Leaflet
-
-```{r generate-cities-leaflet-basemap, echo = FALSE}
-
-# set view and add texture
-me_cities_bm <- leaflet(data = me_cities) %>% #<<
-  addProviderTiles(providers$Stamen.Terrain) %>%
-  setView(lng = -69.5, 
-          lat = 45.3, 
-          zoom = 6.5)
-
-# add city borders
-me_cities_bm %>%
-  addPolygons(
-    opacity = 1,
-    color = "blue", 
-    weight = 2) 
-```
-
-```{r generate-cities-leaflet-labels, echo = FALSE}
-
-# create labels
-me_cities_labels <- sprintf("<strong>%s</strong><br/>geoid # %s ", 
-                  me_cities$NAME, me_cities$GEOID) %>% lapply(htmltools::HTML)
-
-```
-
-
-```{r first-cities-leaflet-map, eval=TRUE}
-me_cities_map <- me_cities_bm %>%
-  addPolygons(
-      color = "blue", 
-      opacity = 1,
-      weight = 2,
-    highlight = highlightOptions( #<<
-        weight = 3, #<<
-        color = "green", #<<
-        fillOpacity = 1, #<<
-        bringToFront = TRUE)) #<< 
-
-me_cities_map
-```
-
- 
-# Counties Leaflet
-
-```{r generate-counties-leaflet-basemap, echo = FALSE}
-
-# set view and add texture
-# me_counties_bm <- leaflet(data = me_counties) %>% #<<
-#  addProviderTiles(providers$Stamen.Terrain) %>%
-#  setView(lng = -69.5, 
-#          lat = 45.3, 
-#          zoom = 6.5)
-
-# add city borders
-# me_counties_bm %>%
-#  addPolygons(
-#    opacity = 1,
-#    color = "blue", 
-#    weight = 2) 
-```
-
-```{r generate-counties-leaflet-labels, echo = FALSE}
-
-# create labels
-# me_counties_labels <- sprintf("<strong>%s</strong><br/>objectid # %s ", 
-#                  me_counties$NAME, me_counties$OBJECTID) %>% lapply(htmltools::HTML)
-
-```
-
-
-```{r first-counties-leaflet-map, eval=TRUE}
-
-# me_counties_map <- me_counties_bm %>%
-#  addPolygons(
-#      color = "blue", 
-#      opacity = 1,
-#      weight = 2,
-#    highlight = highlightOptions( #<<
-#        weight = 3, #<<
-#        color = "green", #<<
-#        fillOpacity = 1, #<<
-#        bringToFront = TRUE)) #<< 
-
-# me_counties_map
-```
-
-## Gathering Census Data
-
-```{r census-data-api}
-
-# apply api key
+# apply census api key
 census_api_key("5177724b01a7fe4714097e711cb95230c37cfce7", install = TRUE, overwrite = TRUE)
 
+# import census data
+census_place_df <- get_acs(geography = "place", variables = c("B01003_001E"), state = "ME", geometry = TRUE)
+census_county_sub_df <- get_acs(geography = "county subdivision", variables = c("B01003_001E"), state = "ME", geometry = TRUE)
+
 ```
 
 
-```{r }
+```{r reformat-location-variables}
 
-# import census data
-census_df <- get_acs(geography = "place", variables = c("B01003_001E"), state = "ME", geometry = TRUE)
-census_df2 <- get_acs(geography = "county subdivision", variables = c("B01003_001E"), state = "ME", geometry = TRUE)
-
-# reformat location variables
-census_df <- census_df %>%
+# reformat location variables >> census place df
+census_place_df <- census_place_df %>%
   separate(NAME, into = c("Place", "State"), sep = ",") %>%
   mutate(Place = str_remove(Place, " CDP| city"))
 
-# reformat location variables
-census_df2 <- census_df2 %>%
+# reformat location variables >> census county subdivision df
+census_county_sub_df <- census_county_sub_df %>%
   separate(NAME, into = c("Place", "County", "State"), sep = ",") %>%
-  mutate(Place = str_remove(Place, "town"))
+  mutate(Place = str_remove(Place, "town| city")) %>%
+  mutate(Place = str_replace(Place, "UT", "Twp")) %>%
+  mutate(Place = str_replace(Place, "plantation", "Plantation")) %>%
+  mutate(Place = str_replace(Place, "George town", "Georgetown")) %>%
+  mutate(Place = str_replace(Place, "Hibberts gore", "Hibberts Gore")) %>%
+  mutate(Place = str_trim(Place, side = "both"))
+
+# reformat location variables >> tick towns df
+tick_towns <- tick_towns %>%
+  mutate(town = str_replace(town, "plt", "Plantation")) %>%
+  mutate(town = str_replace(town, "Plt", "Plantation")) %>%
+  mutate(town = str_replace(town, "Monhegan Island", "Monhegan")) %>%
+  mutate(town = str_replace(town, "Muscle Ridge", "Muscle Ridge Islands")) %>%
+  mutate(town = str_replace(town, "Cary Twp", "Cary Plantation")) %>%
+  mutate(town = str_replace(town, "Codyville Twp", "Codyville Plantation")) %>%
+  mutate(town = str_replace(town, "Seboomook Twp", "Seboomook Lake Twp")) %>%
+  mutate(town = str_replace(town, "Prentiss Twp T4 R4 NBKP", "Prentiss Twp")) %>%
+  mutate(town = str_replace(town, "Dennistown", "Dennis")) %>%
+  mutate(town = str_replace(town, "Saint", "St.")) %>%
+  mutate(town = str_replace(town, "Atkinson Twp", "Atkinson")) %>%
+  mutate(town = str_replace(town, "Bancroft Twp", "Bancroft")) 
+```
+
+
+```{r visualize-population-data}
 
 # visualize polygons using ggplot
-ggplot(census_df) +
+ggplot(census_place_df) +
     geom_sf(aes(fill = estimate))
 
 # visualize polygons using ggplot
-ggplot(census_df2) +
+ggplot(census_county_sub_df) +
     geom_sf(aes(fill = estimate))
 
 ```
 
-```{r tick-and-population-leafelt}
+```{r organize-data}
 
 # set CRS
-census_df <- st_transform(census_df, "+init=epsg:4326")
-census_df2 <- st_transform(census_df, "+init=epsg:4326")
+census_place_df <- st_transform(census_place_df, "+init=epsg:4326")
+census_county_sub_df <- st_transform(census_county_sub_df, "+init=epsg:4326")
 
-# join tick data with census data
-tick_census_df <- tick_towns %>%
-  left_join(census_df, by = c("town" = "Place"))
+# join tick data with census data >> census place df with tick towns df
+tick_census_place_df <- tick_towns %>%
+  left_join(census_place_df, by = c("town" = "Place"))
+
+# join tick data with census data >> census county subdivision df with tick towns df
+tick_census_county_sub_df <- tick_towns %>%
+  left_join(census_county_sub_df, by = c("town" = "Place"))
+
+missing <- anti_join(census_county_sub_df, tick_towns, by = c("Place" = "town")) %>%
+                    select(Place, County)
+
+```
+
+```{r tick-and-population-leaflet}
 
 # create labels
 pop_labels <- sprintf(
