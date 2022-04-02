@@ -78,16 +78,23 @@ tick_towns <- tick_towns %>%
   mutate(town = str_replace(town, "Bancroft Twp", "Bancroft")) 
 ```
 
-
 ```{r visualize-population-data}
 
 # visualize polygons using ggplot
-ggplot(census_place_df) +
-    geom_sf(aes(fill = estimate))
+plot1 <- ggplot(census_place_df) +
+  geom_sf(aes(fill = estimate)) +
+  labs(fill = "Population",
+       title = "Maine population",
+       subtitle = "By census place")
 
 # visualize polygons using ggplot
-ggplot(census_county_sub_df) +
-    geom_sf(aes(fill = estimate))
+plot2 <- ggplot(census_county_sub_df) +
+  geom_sf(aes(fill = estimate)) +
+  labs(fill = "Population",
+       title = "Maine population",
+       subtitle = "By census county subdivision") 
+
+gridExtra::grid.arrange(plot1, plot2, ncol=2)
 
 ```
 
@@ -102,9 +109,10 @@ tick_census_place_df <- tick_towns %>%
   left_join(census_place_df, by = c("town" = "Place"))
 
 # join tick data with census data >> census county subdivision df with tick towns df
-tick_census_county_sub_df <- tick_towns %>%
-  left_join(census_county_sub_df, by = c("town" = "Place"))
+tick_census_county_sub_df <- census_county_sub_df %>%
+  left_join(tick_towns, by = c("Place" = "town"))
 
+# view non-matches >> census county subdivision df with tick towns df
 missing <- anti_join(census_county_sub_df, tick_towns, by = c("Place" = "town")) %>%
                     select(Place, County)
 
@@ -115,48 +123,72 @@ missing <- anti_join(census_county_sub_df, tick_towns, by = c("Place" = "town"))
 # create labels
 pop_labels <- sprintf(
   "<strong>%s (2019)</strong> <br/>Population: %g",
-   census_df$Place, census_df$estimate
+   tick_census_county_sub_df$Place, tick_census_county_sub_df$estimate
 ) %>% lapply(htmltools::HTML)
 
 tick_labels <- sprintf(
   "<strong>%s (2019)</strong> <br/>Positive Lyme Tests: %g, <br/> Positivity Rate: %s",
-  tick_towns$town, tick_towns$borrelia_positive, tick_towns$borrelia_percent
+    tick_census_county_sub_df$Place, 
+    tick_census_county_sub_df$borrelia_positive, 
+    tick_census_county_sub_df$borrelia_percent
 ) %>% lapply(htmltools::HTML)
 
 # create layer names
-Groupnames <- c("Population", "Positive Lyme Tests")
+Groupnames <- c("Population", "Lyme Disease Prevalence")
 
 # define bins
 bins1 <- seq(0, 80000, by = 10000)
 bins2 <- seq(0, 30, by = 3)
 
 # select color palettes
-pal1 <- colorBin("OrRd", domain = census_df$estimate, bins = bins)
-pal2 <- colorBin("PuRd", domain = tick_towns$borrelia_positive, bins = bins2)
+pal1 <- colorBin("OrRd", domain = tick_census_county_sub_df$estimate, bins = bins1)
+pal2 <- colorBin("PuRd", domain = tick_census_county_sub_df$borrelia_positive, bins = bins2)
 
 # generate leaflet
-leaflet(census_df) %>%
-  addProviderTiles(providers$Stamen.Terrain) %>%
-  addProviderTiles(providers$Stamen.TerrainLabels) %>%
-  addPolygons(fillColor = ~pal1(census_df$estimate),
+leaflet(tick_census_county_sub_df) %>%
+  addProviderTiles(providers$OpenStreetMap) %>%
+  addPolygons(fillColor = ~pal1(tick_census_county_sub_df$estimate),
               color = "black",
               weight = 1,
               fillOpacity = 0.9,
               label = ~pop_labels,
               group = "Population") %>%
-  addPolygons(fillColor = ~pal2(tick_towns$borrelia_positive),
+  addPolygons(fillColor = ~pal2(tick_census_county_sub_df$borrelia_positive),
               color = "black",
               weight = 1,
               fillOpacity = 0.9,
               label = ~tick_labels,
-              group = "Positive Lyme Tests") %>%
+              group = "Lyme Disease Prevalence") %>%
+  addLegend(values = ~tick_census_county_sub_df$estimate, 
+            group = "Population", 
+            position = "bottomleft", 
+            title = "Population",
+            opacity = 1,
+            pal = pal1) %>%
+  addLegend(values = ~tick_census_county_sub_df$babesia_positive, 
+            group = "Lyme Disease Prevalence", 
+            position = "bottomleft", 
+            title = "Lyme Disease Prevalence",
+            opacity = 1,
+            pal = pal2) %>%
   setView(lng = -69.5, 
           lat = 45.3, 
           zoom = 6.5) %>%
-   addLayersControl(
-     baseGroups = Groupnames,
-     options = layersControlOptions(collapsed = FALSE)
-  ) 
+  addLayersControl(
+     baseGroups = c("Population", "Lyme Disease Prevalence"),
+     options = layersControlOptions(collapsed = FALSE)) %>%
+  htmlwidgets::onRender("
+    function(el, x) {
+      var updateLegend = function () {
+          var selectedGroup = document.querySelectorAll('input:checked')[0].nextSibling.innerText.substr(1);
+          document.querySelectorAll('.legend').forEach(a => a.hidden = true);
+          document.querySelectorAll('.legend').forEach(l => {
+            if (l.children[0].children[0].innerText == selectedGroup) l.hidden = false;
+          });
+      };
+      updateLegend();
+      this.on('baselayerchange', e => updateLegend());
+    }")
 
 ```
 
