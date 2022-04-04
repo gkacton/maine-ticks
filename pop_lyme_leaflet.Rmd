@@ -1,5 +1,5 @@
 ---
-title: "Population and Lyme Disease Prevalence of Maine Cities"
+title: "Population and Lyme Disease Prevalence in Maine"
 output: 
   html_document:
      toc: TRUE
@@ -10,9 +10,9 @@ output:
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
-# Load Packages
-
 ```{r libraries, echo = FALSE}
+
+# install packages
 
 library(tidyverse) 
 library(leaflet) 
@@ -28,24 +28,63 @@ library(fedmatch)
 
 ```
 
-# Import and Clean Data
+# Introduction
+
+In order to determine the regions of Maine with the greatest risk associated with Lyme disease, it is important to understand where Lyme disease cases are most often reported as well as how the population of Maine is distributed across the state. While it is nearly impossible to gather tick population data, comparing human population numbers to Lyme disease prevalence data may provide valuable insight into where ticks tend to congregate as well as the risk of contracting Lyme disease in different parts of the state.
+
+# Data
+
+## Tickborne Diseases
+
+Lyme disease prevalence data from 2019-2022 for the state of Maine is publicly available on the University of Maine website. Data for several other tickborne diseases is also available on the website.
+
+
+### UMaine Tickborne Disease Prevalence Data {.unlisted .unnumbered}
 
 ```{r data-import, echo = FALSE}
 
 # read csv files
 tick_towns <- read_csv("/cloud/project/data/ticks/tickborne_prevalence_town.csv")
 
-# apply census api key
+```
+
+```{r tick-data-table}
+
+# construct interactive data table displaying tick data
+DT::datatable(tick_towns,
+              options = list(
+                paging = TRUE,
+                pageLength = 8),
+              height = 500)
+
+```
+
+## Population 
+
+Population data for the state of Maine is publicly available via the U.S. Census Bureau records. This data exists in several different spatial capacities, so determining the most useful spatial unit is very important when working with the data. The data itself can be imported using a unique API key in RStudio.
+
+### Importing population data from the U.S. Census Bureau {.unlisted .unnumbered}
+
+```{r census-data-import, echo = TRUE, warning = FALSE, message = FALSE, results = 'hide'}
+
+# apply unique census api key
 census_api_key("5177724b01a7fe4714097e711cb95230c37cfce7", install = TRUE, overwrite = TRUE)
 
-# import census data
+# import census data 
+## spatial unit --> place
+## variable of interest --> population
 census_place_df <- get_acs(geography = "place", variables = c("B01003_001E"), state = "ME", geometry = TRUE)
+
+# import census data 
+## spatial unit --> county subdivision
+## variable of interest --> population
 census_county_sub_df <- get_acs(geography = "county subdivision", variables = c("B01003_001E"), state = "ME", geometry = TRUE)
 
 ```
 
+<br>
 
-```{r reformat-location-variables}
+```{r reformat-location-variables, echo = FALSE}
 
 # reformat location variables >> census place df
 census_place_df <- census_place_df %>%
@@ -78,6 +117,38 @@ tick_towns <- tick_towns %>%
   mutate(town = str_replace(town, "Bancroft Twp", "Bancroft")) 
 ```
 
+### Census data using "place" spatial unit {.unlisted .unnumbered}
+
+```{r census-data-table-place}
+
+# construct interactive data table displaying census data (place)
+DT::datatable(census_place_df,
+              options = list(
+                paging = TRUE,
+                pageLength = 10),
+              height = 500)
+
+```
+
+<br>
+
+### Census data using "county subdivision" spatial unit {.unlisted .unnumbered}
+
+```{r census-data-table-county-subdivision}
+
+# construct interactive data table displaying census data (county subdivision)
+DT::datatable(census_county_sub_df,
+              options = list(
+                paging = TRUE,
+                pageLength = 10),
+              height = 500)
+
+```
+
+### Spatial unit differences {.unlisted .unnumbered}
+
+Differences in the size and coverage of data points from the Census data can be visualized using static spatial plots. Although the "place" data does a good job displaying the major population centers of Maine, the "county subdivision" data appears to have more complete coverage of the state.
+
 ```{r visualize-population-data}
 
 # visualize polygons using ggplot
@@ -98,7 +169,7 @@ gridExtra::grid.arrange(plot1, plot2, ncol=2)
 
 ```
 
-```{r organize-data}
+```{r organize-data, echo = FALSE}
 
 # set CRS
 census_place_df <- st_transform(census_place_df, "+init=epsg:4326")
@@ -117,6 +188,10 @@ missing <- anti_join(census_county_sub_df, tick_towns, by = c("Place" = "town"))
                     select(Place, County)
 
 ```
+
+### Population and Tick Prevalence Leaflet {.unlisted .unnumbered}
+
+The population data and the tick prevalence data can be explored relative to one another on the interactive leaflet plot shown below. It is interesting to see that the majority of the tick cases in the data are located on the coast, and not necessarily in the largest population centers in the state.
 
 ```{r tick-and-population-leaflet}
 
@@ -195,47 +270,47 @@ leaflet(tick_census_county_sub_df) %>%
 
 ```{r tick-towns-missing-from-census-data, echo = FALSE}
 
-missing_ticktown <- anti_join(tick_towns, census_df, by = c("town" = "Place")) %>%
-                    select(town, borrelia_positive, borrelia_tests)
+# missing_ticktown <- anti_join(tick_towns, census_df, by = c("town" = "Place")) %>%
+#                    select(town, borrelia_positive, borrelia_tests)
 
-DT::datatable(missing_ticktown,
-              options = list(
-                paging = TRUE,
-                pageLength = 10),
-              height = 500)
+# DT::datatable(missing_ticktown,
+#             options = list(
+#                paging = TRUE,
+#                pageLength = 10),
+#              height = 500)
               
 ```
 
 
 ```{r census-towns-missing-from-tick-data, echo = FALSE}
 
-missing_censustown <- anti_join(census_df, tick_towns, by = c("Place" = "town")) %>%
-                      select(Place, estimate, moe)
+# missing_censustown <- anti_join(census_df, tick_towns, by = c("Place" = "town")) %>%
+#                      select(Place, estimate, moe)
 
-DT::datatable(missing_censustown,
-              options = list(
-                paging = TRUE,
-                pageLength = 10),
-              height = 500)
+# DT::datatable(missing_censustown,
+#              options = list(
+#                paging = TRUE,
+#                pageLength = 10),
+#              height = 500)
               
 ```
 
 ```{r fuzzy-match, echo = FALSE}
 
-tick_towns$row_num <- seq.int(nrow(tick_towns)) 
+# tick_towns$row_num <- seq.int(nrow(tick_towns)) 
 
-fuzzy_result <- merge_plus(data1 = census_df, data2 = tick_towns,
-                           by.x = "Place", by.y = "town",
-                           match_type = "fuzzy",
-                           fuzzy_settings = build_fuzzy_settings(
-                             p = 0.1,
-                             maxDist = 0.15),
-                           unique_key_1 = "GEOID", unique_key_2 = "row_num")
+# fuzzy_result <- merge_plus(data1 = census_df, data2 = tick_towns,
+#                           by.x = "Place", by.y = "town",
+#                           match_type = "fuzzy",
+#                           fuzzy_settings = build_fuzzy_settings(
+#                             p = 0.1,
+#                             maxDist = 0.15),
+#                           unique_key_1 = "GEOID", unique_key_2 = "row_num")
 
-DT::datatable(fuzzy_result[[1]],
-              options = list(
-                paging = TRUE,
-                pageLength = 10),
-              height = 500)
+# DT::datatable(fuzzy_result[[1]],
+#              options = list(
+#                paging = TRUE,
+#                pageLength = 10),
+#              height = 500)
               
 ```
