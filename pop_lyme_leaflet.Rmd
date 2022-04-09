@@ -39,19 +39,59 @@ In order to determine the regions of Maine with the greatest risk associated wit
 Lyme disease prevalence data from 2019-2022 for the state of Maine is publicly available on the University of Maine website. Data for several other tickborne diseases is also available on the website.
 
 
-### UMaine Tickborne Disease Prevalence Data {.unlisted .unnumbered}
+### UMaine 2019 Season Prevalence Data By Town {.unlisted .unnumbered}
 
-```{r data-import, echo = FALSE}
+```{r data-import-umaine-prevalence, echo = FALSE}
 
-# read csv files
-tick_towns <- read_csv("/cloud/project/data/ticks/tickborne_prevalence_town.csv")
+# read csv file
+tick_towns <- read_csv("/cloud/project/data/ticks/umaine_tickborne_prevalence_town.csv")
 
 ```
 
-```{r tick-data-table}
+```{r umaine-tick-prevalence-data-table}
 
-# construct interactive data table displaying tick data
+# construct interactive data table displaying UMaine tick testing prevalence data
 DT::datatable(tick_towns,
+              options = list(
+                paging = TRUE,
+                pageLength = 8),
+              height = 500)
+
+```
+
+### Maine Tracking Network Rate of Tickborne Disease by Town 2016-2020 {.unlisted .unnumbered}
+
+```{r data-import-mtn-rate, echo = FALSE}
+
+# read csv file
+mtn_tick_town_rate <- read_csv("/cloud/project/data/ticks/maine_tracking_network_rate.csv")
+
+```
+
+```{r mtn-tick-rate-data-table}
+
+# construct interactive data table displaying tick rate data
+DT::datatable(mtn_tick_town_rate,
+              options = list(
+                paging = TRUE,
+                pageLength = 8),
+              height = 500)
+
+```
+
+### Number of Tickborne Disease Cases by Town 2016-2020 {.unlisted .unnumbered}
+
+```{r data-import-mtn-number, echo = FALSE}
+
+# read csv file
+mtn_tick_town_number <- read_csv("/cloud/project/data/ticks/maine_tracking_network_incidence.csv")
+
+```
+
+```{r mtn-tick-number-data-table}
+
+# construct interactive data table displaying tick incidence data
+DT::datatable(mtn_tick_town_number,
               options = list(
                 paging = TRUE,
                 pageLength = 8),
