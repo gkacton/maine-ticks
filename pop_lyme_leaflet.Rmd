@@ -54,7 +54,7 @@ tick_towns <- read_csv("/cloud/project/data/ticks/umaine_tickborne_prevalence_to
 DT::datatable(tick_towns,
               options = list(
                 paging = TRUE,
-                pageLength = 8),
+                pageLength = 10),
               height = 500)
 
 ```
@@ -66,6 +66,10 @@ DT::datatable(tick_towns,
 # read csv file
 mtn_tick_town_rate <- read_csv("/cloud/project/data/ticks/maine_tracking_network_rate.csv")
 
+# reformat rate
+mtn_tick_town_rate[mtn_tick_town_rate == "*"] = NA
+mtn_tick_town_rate[mtn_tick_town_rate == "NR"] = NA
+
 ```
 
 ```{r mtn-tick-rate-data-table}
@@ -74,7 +78,7 @@ mtn_tick_town_rate <- read_csv("/cloud/project/data/ticks/maine_tracking_network
 DT::datatable(mtn_tick_town_rate,
               options = list(
                 paging = TRUE,
-                pageLength = 8),
+                pageLength = 10),
               height = 500)
 
 ```
@@ -86,6 +90,61 @@ DT::datatable(mtn_tick_town_rate,
 # read csv file
 mtn_tick_town_number <- read_csv("/cloud/project/data/ticks/maine_tracking_network_incidence.csv")
 
+# reformat count variables
+mtn_tick_town_number <- mtn_tick_town_number %>%
+  mutate(Lyme_Label = Lyme) %>%
+  mutate(Lyme_Label = str_replace(Lyme_Label, "NR", "Not Releasable")) %>%
+  mutate(Lyme = str_replace(Lyme, "<6", "6")) %>%
+  mutate(Lyme = str_replace(Lyme, "6-10", "8")) %>%
+  mutate(Lyme = str_replace(Lyme, "11-15", "13")) %>%
+  mutate(Babesiosis_Label = Babesiosis) %>%
+  mutate(Babesiosis_Label = str_replace(Babesiosis_Label, "NR", "Not Releasable")) %>%
+  mutate(Babesiosis = str_replace(Babesiosis, "<6", "6")) %>%
+  mutate(Babesiosis = str_replace(Babesiosis, "6-10", "8")) %>%
+  mutate(Babesiosis = str_replace(Babesiosis, "11-15", "13")) %>%
+  mutate(Anaplasmosis_Label = Anaplasmosis) %>%
+  mutate(Anaplasmosis_Label = str_replace(Anaplasmosis_Label, "NR", "Not Releasable")) %>%
+  mutate(Anaplasmosis = str_replace(Anaplasmosis, "<6", "6")) %>%
+  mutate(Anaplasmosis = str_replace(Anaplasmosis, "6-10", "8")) %>%
+  mutate(Anaplasmosis = str_replace(Anaplasmosis, "11-15", "13"))
+  
+
+# create numeric count variables
+mtn_tick_town_number$Lyme <- as.numeric(mtn_tick_town_number$Lyme)
+mtn_tick_town_number$Babesiosis <- as.numeric(mtn_tick_town_number$Babesiosis)
+mtn_tick_town_number$Anaplasmosis <- as.numeric(mtn_tick_town_number$Anaplasmosis)
+
+mtn_tick_town_number[mtn_tick_town_number == "NR"] = NA
+
+# reformat location variable
+mtn_tick_town_number <- mtn_tick_town_number %>%
+  mutate(Location = str_replace(Location, "Plt", "Plantation")) %>%
+  mutate(Location = str_replace(Location, "Bancroft Twp", "Bancroft")) %>%
+  mutate(Location = str_replace(Location, "Aroostook", "Aroostook Twp")) %>%
+  mutate(Location = str_replace(Location, "Somerset", "Somerset Twp")) %>%
+  mutate(Location = str_replace(Location, "East Hancock", "East Hancock Twp")) %>%
+  mutate(Location = str_replace(Location, "Dennistown", "Dennis")) %>%
+  mutate(Location = str_replace(Location, "East Central Washington", "East Central Washington Twp")) %>%
+  mutate(Location = str_replace(Location, "East Central Franklin", "East Central Franklin Twp")) %>%
+  mutate(Location = str_replace(Location, "West Central Franklin", "West Central Franklin Twp")) %>%
+  mutate(Location = str_replace(Location, "North Franklin", "North Franklin Twp")) %>%
+  mutate(Location = str_replace(Location, "South Franklin", "South Franklin Twp")) %>%
+  mutate(Location = str_replace(Location, "West Franklin", "West Franklin Twp")) %>%
+  mutate(Location = str_replace(Location, "East Central Penobscot", "East Central Penobscot Twp")) %>%
+  mutate(Location = str_replace(Location, "Louds Island", "Louds Island Twp")) %>%
+  mutate(Location = str_replace(Location, "Marshall Island", "Marshall Island Twp")) %>%
+  mutate(Location = str_replace(Location, "Monhegan Island Plantation", "Monhegan Plantation")) %>%
+  mutate(Location = str_replace(Location, "Islands", "Islands Twp")) %>%
+  mutate(Location = str_replace(Location, "North Oxford", "North Oxford Twp")) %>%
+  mutate(Location = str_replace(Location, "South Oxford", "South Oxford Twp")) %>%
+  mutate(Location = str_replace(Location, "North Washington", "North Washington Twp")) %>%
+  mutate(Location = str_replace(Location, "North Penobscot", "North Penobscot Twp")) %>%
+  mutate(Location = str_replace(Location, "Piscataquis", "Piscataquis Twp")) %>%
+  mutate(Location = str_replace(Location, "Prentiss Twp T7 R3 NBPP", "Prentiss Twp")) %>%
+  mutate(Location = str_replace(Location, "Seboomook Lake", "Seboomook Lake Twp")) %>%
+  mutate(Location = str_replace(Location, "Square Lake", "Square Lake Twp")) %>%
+  mutate(Location = str_replace(Location, "Saint", "St.")) 
+  
 ```
 
 ```{r mtn-tick-number-data-table}
@@ -94,7 +153,7 @@ mtn_tick_town_number <- read_csv("/cloud/project/data/ticks/maine_tracking_netwo
 DT::datatable(mtn_tick_town_number,
               options = list(
                 paging = TRUE,
-                pageLength = 8),
+                pageLength = 10),
               height = 500)
 
 ```
@@ -139,7 +198,9 @@ census_county_sub_df <- census_county_sub_df %>%
   mutate(Place = str_replace(Place, "plantation", "Plantation")) %>%
   mutate(Place = str_replace(Place, "George town", "Georgetown")) %>%
   mutate(Place = str_replace(Place, "Hibberts gore", "Hibberts Gore")) %>%
-  mutate(Place = str_trim(Place, side = "both"))
+  mutate(Place = str_trim(Place, side = "both")) %>%
+  mutate(Place = str_replace(Place, "Passamaquoddy Pleasant Point Reservation", "Pleasant Point")) %>%
+  mutate(Place = str_replace(Place, "Passamaquoddy Indian Township Reservation", "Indian Twp Res"))
 
 # reformat location variables >> tick towns df
 tick_towns <- tick_towns %>%
@@ -307,50 +368,47 @@ leaflet(tick_census_county_sub_df) %>%
 
 ```
 
+```{r mtn-tick-leaflet}
 
-```{r tick-towns-missing-from-census-data, echo = FALSE}
+# join tick data with census data >> census county subdivision df with mtn number df
+mtn_number_census_county_sub <- census_county_sub_df %>%
+  left_join(mtn_tick_town_number, by = c("Place" = "Location"))
 
-# missing_ticktown <- anti_join(tick_towns, census_df, by = c("town" = "Place")) %>%
-#                    select(town, borrelia_positive, borrelia_tests)
+# view non-matches >> census county subdivision df with mtn number df
+missing <- anti_join(census_county_sub_df, mtn_tick_town_number, by = c("Place" = "Location")) %>%
+                    select(Place, County, estimate)
 
-# DT::datatable(missing_ticktown,
-#             options = list(
-#                paging = TRUE,
-#                pageLength = 10),
-#              height = 500)
-              
+# create labels
+mtn_number_labels <- sprintf(
+  "<strong>%s (2016-2020)</strong> <br/>Lyme Cases: %s",
+   mtn_number_census_county_sub$Place,  mtn_number_census_county_sub$Lyme_Label
+) %>% lapply(htmltools::HTML)
+
+# define bins
+bins3 <- seq(0, 160, by = 20)
+
+# select color palettes
+pal3 <- colorBin("OrRd", domain = mtn_number_census_county_sub$Lyme, bins = bins3)
+
+# generate leaflet
+leaflet(mtn_number_census_county_sub) %>%
+  addProviderTiles(providers$OpenStreetMap) %>%
+  addPolygons(fillColor = ~pal3(mtn_number_census_county_sub$Lyme),
+              color = "black",
+              weight = 1,
+              fillOpacity = 0.9,
+              label = ~mtn_number_labels,
+              group = "Lyme") %>%
+  addLegend(values = ~mtn_number_census_county_sub$Lyme, 
+            group = "Lyme", 
+            position = "bottomleft", 
+            title = "Lyme Disease Cases",
+            opacity = 1,
+            pal = pal3,
+            na.label = "NA or Not Releasable") %>%
+  setView(lng = -69.5, 
+          lat = 45.3, 
+          zoom = 6.5) 
+  
 ```
 
-
-```{r census-towns-missing-from-tick-data, echo = FALSE}
-
-# missing_censustown <- anti_join(census_df, tick_towns, by = c("Place" = "town")) %>%
-#                      select(Place, estimate, moe)
-
-# DT::datatable(missing_censustown,
-#              options = list(
-#                paging = TRUE,
-#                pageLength = 10),
-#              height = 500)
-              
-```
-
-```{r fuzzy-match, echo = FALSE}
-
-# tick_towns$row_num <- seq.int(nrow(tick_towns)) 
-
-# fuzzy_result <- merge_plus(data1 = census_df, data2 = tick_towns,
-#                           by.x = "Place", by.y = "town",
-#                           match_type = "fuzzy",
-#                           fuzzy_settings = build_fuzzy_settings(
-#                             p = 0.1,
-#                             maxDist = 0.15),
-#                           unique_key_1 = "GEOID", unique_key_2 = "row_num")
-
-# DT::datatable(fuzzy_result[[1]],
-#              options = list(
-#                paging = TRUE,
-#                pageLength = 10),
-#              height = 500)
-              
-```
