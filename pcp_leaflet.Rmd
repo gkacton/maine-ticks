@@ -22,15 +22,22 @@ library(fontawesome)
 
 ```{r data import, echo = FALSE}
 
-# read csv
-pcp_df <- read_csv("data/primary care providers/maine_primary_care.csv")
+# read csv files
+pcp_scrape_df <- read_csv("data/primary care providers/maine_primary_care.csv")
+federal_health_centers <- read_csv("data/primary care providers/federally_recognized_health_centers.csv")
+
+# reformatting
+federal_health_centers <- federal_health_centers %>%
+  mutate(`Facility Type` = str_replace(`Health Center Service Delivery Site Location Setting Description`, 
+          "All Other Clinic Types", 
+          "Clinic"))
 
 ```
 
 
-```{r primary-care-provider-leaflet}
+```{r scraped_primary-care-provider-leaflet}
 
-maine_icons <- awesomeIconList(
+maine_icons_scrape <- awesomeIconList(
   `Doctor` = makeAwesomeIcon(
   icon = "user-md",
   library = "fa",
@@ -104,47 +111,115 @@ maine_icons <- awesomeIconList(
 )
 
 # make popup text with name, address, notes, and link to website
-pcp_df <-
-  pcp_df %>% 
+pcp_scrape_df <-
+  pcp_scrape_df %>% 
   mutate(full_website = paste("<b><a href='https://www.", website,"' target='_blank'>", title,"</a></b>", "<br/>", sep = "")) 
 
 # make popup text with name, address, notes, and link to website
-pcp_labels <- sprintf(
+pcp_scrape_labels <- sprintf(
   "<strong>%s</strong><br/>%s<br/><strong>Rating: %g of 5</strong>",
-  pcp_df$full_website, pcp_df$address, pcp_df$rating
+  pcp_scrape_df$full_website, pcp_scrape_df$address, pcp_scrape_df$rating
 ) %>% lapply(htmltools::HTML)
 
 
 # setup basemap
-pcp_leaflet <- 
+pcp_scrape_leaflet <- 
   leaflet() %>% 
   addTiles() %>%
-  addMarkers(~pcp_df$longitude, 
-             ~pcp_df$latitude, 
-             data = pcp_df, 
-             group = pcp_df$category, 
-             popup = ~pcp_labels)
+  addMarkers(~pcp_scrape_df$longitude, 
+             ~pcp_scrape_df$latitude, 
+             data = pcp_scrape_df, 
+             group = pcp_scrape_df$category, 
+             popup = ~pcp_scrape_labels)
   
 
-pcp_leaflet <- 
-      leaflet(data = pcp_df) %>%
+pcp_scrape_leaflet <- 
+      leaflet(data = pcp_scrape_df) %>%
       addTiles() %>% addAwesomeMarkers(
       ~longitude,
       ~latitude,
-      popup = ~pcp_labels,
-      icon = ~maine_icons[category], 
+      popup = ~pcp_scrape_labels,
+      icon = ~maine_icons_scrape[category], 
       group = ~category)
 
 # add layer controls to map 
-pcp_leaflet <- 
-  pcp_leaflet %>% 
+pcp_scrape_leaflet <- 
+  pcp_scrape_leaflet %>% 
   addLayersControl(
-    overlayGroups = pcp_df$category,
+    overlayGroups = pcp_scrape_df$category,
     options = layersControlOptions(collapsed = FALSE)
   )
 
 # save widget 
-saveWidget(pcp_leaflet, "maine_pcp.html")
+saveWidget(pcp_scrape_leaflet, "maine_pcp.html")
+
+```
+
+```{r federal-health-centers-leaflet}
+
+maine_icons_fed <- awesomeIconList(
+  `Clinic` = makeAwesomeIcon(
+  icon = "plus-square",
+  library = "fa",
+  markerColor = "lightred"
+),
+  `School` = makeAwesomeIcon(
+  icon = "graduation-cap",
+  library = "fa",
+  markerColor = "green"
+),
+  `Nursing Home` = makeAwesomeIcon(
+  icon = "wheelchair",
+  library = "fa",
+  markerColor = "beige"
+),
+  `Unknown` = makeAwesomeIcon(
+  icon = "question-circle",
+  library = "fa",
+  markerColor = "blue"
+)
+)
+
+# make popup text with name, address, notes, and link to website
+fed_labels <- sprintf(
+  "<strong>%s</strong><br/>%s, %s ME<br/>%s",
+  federal_health_centers$`Site Name`, 
+  federal_health_centers$`Site Address`, 
+  federal_health_centers$`Site City`,
+  federal_health_centers$`Site Telephone Number`
+) %>% lapply(htmltools::HTML)
+
+
+# setup basemap
+fed_leaflet <- 
+  leaflet() %>% 
+  addTiles() %>%
+  addMarkers(~federal_health_centers$`Geocoding Artifact Address Primary X Coordinate`, 
+             ~federal_health_centers$`Geocoding Artifact Address Primary Y Coordinate`, 
+             data = federal_health_centers, 
+             group = federal_health_centers$`Facility Type`, 
+             popup = ~fed_labels)
+  
+
+fed_leaflet <- 
+      leaflet(data = federal_health_centers) %>%
+      addTiles() %>% addAwesomeMarkers(
+      ~`Geocoding Artifact Address Primary X Coordinate`,
+      ~`Geocoding Artifact Address Primary Y Coordinate`,
+      popup = ~fed_labels,
+      icon = ~maine_icons_fed[`Facility Type`], 
+      group = ~`Facility Type`)
+
+# add layer controls to map 
+fed_leaflet <- 
+  fed_leaflet %>% 
+  addLayersControl(
+    overlayGroups = federal_health_centers$`Facility Type`,
+    options = layersControlOptions(collapsed = FALSE)
+  )
+
+# save widget 
+saveWidget(fed_leaflet, "maine_pcp_fed.html")
 
 ```
 
