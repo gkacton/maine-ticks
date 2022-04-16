@@ -24,7 +24,7 @@ library(dplyr)
 
 # read csv
 
-pcp_df <- read_csv("data/maine_primary_care.csv")
+pcp_df <- read_csv("data/primary care providers/maine_primary_care.csv")
 
 # glimpse data
 
