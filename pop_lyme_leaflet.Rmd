@@ -401,7 +401,7 @@ leaflet(mtn_number_census_county_sub) %>%
               group = "Lyme") %>%
   addLegend(values = ~mtn_number_census_county_sub$Lyme, 
             group = "Lyme", 
-            position = "bottomleft", 
+            position = "topright", 
             title = "Lyme Disease Cases",
             opacity = 1,
             pal = pal3,
