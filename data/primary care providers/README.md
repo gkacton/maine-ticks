@@ -2,16 +2,17 @@
 
 #### Description
 
-(insert description)
+"This dataset provides a list of federally-funded health centers that provide health services. For more than 40 years, Health Resources and Services Administration (HRSA)-supported health centers have provided comprehensive, culturally competent, quality primary health care services to medically underserved communities and vulnerable populations. Health centers are community-based and consumer-run organizations that serve populations with limited access to health care. These include low-income populations, the uninsured, those with limited English proficiency, migratory and seasonal agricultural workers, individuals and families experiencing homelessness, and those living in public housing."
 
-#### Usage
-
-federally_recognized_health_centers
+Despription reported directly from data.hrsa.gov 
 
 #### Format
 
 A data frame with 197 observations and 13 variables:
 
+### Data Dictionary
+
+`federally_recognized_health_centers.csv`
 
 |variable                                                         |class     |description |
 |:----------------------------------------------------------------|:---------|:-----------|
@@ -50,37 +51,18 @@ A data frame with 197 observations and 13 variables:
 |Complete County Name                                             |character | Proper county name associated with a specified data element |
 |County Equivalent Name                                           |character | Name of the county or county equivalent in which the associated address is located |
 
-
-
-
-
-
 #### Source
 
-(insert source) 
+https://data.hrsa.gov/data/download?data=HSCD#HSCD
 
-## **Temperature Dataframe**
+### Cleaning Scrpit
 
-#### Description
+# read in .csv file
+federal_health_centers <- read_csv("INSERT FILE PATH")
 
-(insert description)
+# recode setting description
+federal_health_centers <- federal_health_centers %>%
+  mutate(`Facility Type` = str_replace(`Health Center Service Delivery Site Location Setting Description`, 
+          "All Other Clinic Types", 
+          "Clinic"))
 
-#### Usage
-
-temperature_df
-
-#### Format
-
-A data frame with 1,980 rows and 13 variables:
-
-- `Field Station`: Name of NeCSA location
-- `Data Collection Site`: Location of data collection/ data collection site #
-- `Latitude`: Latitude of NeSCA site (-90 to 90)
-- `Longitdue`: Longitude of NeSCA site (-180 to 180)
-- `Date`: Date of data collection (MM/DD/YYYY)
-- `Time`: Time of data collection (24 hour format)
-- `Water Temperature`: Water temperature in degrees celcius	
-
-#### Source
-
-(insert source) 
