@@ -12,7 +12,7 @@ A data frame with 197 observations and 34 variables
 
 ### Data Dictionary
 
-`federally_recognized_health_centers.csv`
+## `federally_recognized_health_centers.csv`
 
 |variable                                                         |class     |description |
 |:----------------------------------------------------------------|:---------|:-----------|
@@ -80,7 +80,7 @@ A data frame with 245 observations and 15 variables
 
 ### Data Dictionary
 
-`maine_primary_care_scrape.csv`
+## `maine_primary_care_scrape.csv`
 
 |variable                                     |class     |description |
 |:--------------------------------------------|:---------|:-----------|
