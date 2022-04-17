@@ -1,12 +1,12 @@
 ## **Federal Health Centers**
 
-#### Description
+### Description
 
 "This dataset provides a list of federally-funded health centers that provide health services. For more than 40 years, Health Resources and Services Administration (HRSA)-supported health centers have provided comprehensive, culturally competent, quality primary health care services to medically underserved communities and vulnerable populations. Health centers are community-based and consumer-run organizations that serve populations with limited access to health care. These include low-income populations, the uninsured, those with limited English proficiency, migratory and seasonal agricultural workers, individuals and families experiencing homelessness, and those living in public housing."
 
 Despription reported directly from data.hrsa.gov 
 
-#### Format
+### Format
 
 A data frame with 197 observations and 13 variables:
 
@@ -57,10 +57,10 @@ https://data.hrsa.gov/data/download?data=HSCD#HSCD
 
 ### Cleaning Scrpit
 
-# read in .csv file
+#### read in .csv file
 federal_health_centers <- read_csv("INSERT FILE PATH")
 
-# recode setting description
+##### recode setting description
 federal_health_centers <- federal_health_centers %>%
   mutate(`Facility Type` = str_replace(`Health Center Service Delivery Site Location Setting Description`, 
           "All Other Clinic Types", 
