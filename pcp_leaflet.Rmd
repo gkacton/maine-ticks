@@ -26,7 +26,12 @@ library(fontawesome)
 pcp_scrape_df <- read_csv("data/primary care providers/maine_primary_care_scrape.csv")
 federal_health_centers <- read_csv("data/primary care providers/federally_recognized_health_centers.csv")
 
-# reformatting
+# reformatting scraped data
+## drop unnecessary variables
+pcp_scrape_df <- pcp_scrape_df[,!(names(pcp_scrape_df) %in% c("attributes","timestamp"))]
+
+# reformatting federal health centers data
+## re-code setting description
 federal_health_centers <- federal_health_centers %>%
   mutate(`Facility Type` = str_replace(`Health Center Service Delivery Site Location Setting Description`, 
           "All Other Clinic Types", 
