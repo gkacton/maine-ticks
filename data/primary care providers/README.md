@@ -8,7 +8,7 @@ Despription reported directly from data.hrsa.gov
 
 ### Format
 
-A data frame with 197 observations and 13 variables:
+A data frame with 197 observations and 13 variables
 
 ### Data Dictionary
 
@@ -57,10 +57,10 @@ https://data.hrsa.gov/data/download?data=HSCD#HSCD
 
 ### Cleaning Scrpit
 
-#### read in .csv file
+- #### read in .csv file
 federal_health_centers <- read_csv("INSERT FILE PATH")
 
-##### recode setting description
+- ##### recode setting description
 federal_health_centers <- federal_health_centers %>%
   mutate(`Facility Type` = str_replace(`Health Center Service Delivery Site Location Setting Description`, 
           "All Other Clinic Types", 
