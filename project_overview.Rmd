@@ -1,0 +1,40 @@
+---
+title: "NeSCA Project Info Sheet"
+author: "Laurie Baker and Matt Clayton"
+date: "4/16/2022"
+output: 
+   html_document:
+     toc: TRUE
+     toc_depth: 2
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Community Partner Background
+
+## Project Overview
+
+## Main data science questions (Includes any key questions you hope the challenge will answer).
+
+-   Why do most Lyme disease cases appear to occur in mid-coast Maine? Could the data be skewed by reporting biases? Are there any other factors at play (population, outdoor recreation, age of population, etc...)?
+
+-   Are there areas of Maine that suffer from a lack of health care coverage? Do these under-served areas have an increased risk for getting sick with Lyme disease?
+
+## How will addressing this challenge benefit the community you serve?
+
+## Data sets
+
+|Usage                  |Description                            |
+|:----------------------|:--------------------------------------|
+| `federally_recognized_health_centers.csv` | List of all the federally-funded health centers in Maine that provide health services (Health Resources and Services Administration - HRSA) |
+|`maine_primary_care_scrape.csv`            | List of primary care providers and other related medical practices in the state of Maine, scraped from google maps.|
+|`umaine_tickborne_prevalence_town.csv`     | 1-year prevalence data for 6 different pathogens found in ticks (UMaine)|
+|`maine_tracking_network_incidence.csv`     | 5-year totals (2016-2020) of Lyme disease, Anaplasmosis, and Babesiosis cases by town (Maine CDC) |
+|`maine_tracking_network_rate.csv`          | 5-year incidence rates (positive cases per 100,000 people, 2016-2020) for Lyme disease, Anaplasmosis, and Babesiosis cases by town (Maine CDC)|
+|                                           |                   |
+
+## Key Milestones and Project/Outcome partners hope to achieve?
+
+## Resources and Background Reading
