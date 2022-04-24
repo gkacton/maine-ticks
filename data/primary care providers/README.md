@@ -55,7 +55,7 @@ A data frame with 197 observations and 34 variables
 
 https://data.hrsa.gov/data/download?data=HSCD#HSCD
 
-### Cleaning Scrpit
+### Cleaning Script
 
 - #### read in .csv file
 federal_health_centers <- read_csv("INSERT FILE PATH")
@@ -102,7 +102,7 @@ A data frame with 245 observations and 15 variables
 
 https://www.google.com/maps
 
-### Cleaning Scrpit
+### Cleaning Script
 
 - #### read in .csv file
 pcp_scrape_df <- read_csv("INSERT FILE PATH")
