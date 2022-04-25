@@ -4,7 +4,7 @@
 
 "This dataset provides a list of federally-funded health centers that provide health services. For more than 40 years, Health Resources and Services Administration (HRSA)-supported health centers have provided comprehensive, culturally competent, quality primary health care services to medically underserved communities and vulnerable populations. Health centers are community-based and consumer-run organizations that serve populations with limited access to health care. These include low-income populations, the uninsured, those with limited English proficiency, migratory and seasonal agricultural workers, individuals and families experiencing homelessness, and those living in public housing."
 
-Despription reported directly from data.hrsa.gov 
+*Despription reported directly from data.hrsa.gov* 
 
 ### Format
 
@@ -57,15 +57,16 @@ https://data.hrsa.gov/data/download?data=HSCD#HSCD
 
 ### Cleaning Script
 
-- #### read in .csv file
-federal_health_centers <- read_csv("INSERT FILE PATH")
+```{r cleaning-script} 
+# read in .csv file
+federal_health_centers <- read_csv("/cloud/project/data/primary care providers/federally_recognized_health_centers.csv")
 
-- ##### recode setting description
+# recode setting description
 federal_health_centers <- federal_health_centers %>%
   mutate(`Facility Type` = str_replace(`Health Center Service Delivery Site Location Setting Description`, 
           "All Other Clinic Types", 
           "Clinic"))
-
+```
 -----------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 ## **Google Maps Scraped Data**
@@ -104,8 +105,10 @@ https://www.google.com/maps
 
 ### Cleaning Script
 
-- #### read in .csv file
-pcp_scrape_df <- read_csv("INSERT FILE PATH")
+```{r cleaning-script} 
+# read in .csv file
+pcp_scrape_df <- read_csv("/cloud/project/data/primary care providers/maine_primary_care_scrape.csv")
 
-- ##### drop unnecessary variables
+# drop unnecessary variables
 pcp_scrape_df <- pcp_scrape_df[,!(names(pcp_scrape_df) %in% c("attributes","timestamp"))]
+```
