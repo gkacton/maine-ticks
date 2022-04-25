@@ -23,8 +23,8 @@ library(fontawesome)
 ```{r data import, echo = FALSE}
 
 # read csv files
-pcp_scrape_df <- read_csv("data/primary care providers/maine_primary_care_scrape.csv")
-federal_health_centers <- read_csv("data/primary care providers/federally_recognized_health_centers.csv")
+pcp_scrape_df <- read_csv("/cloud/project/data/primary care providers/maine_primary_care_scrape.csv")
+federal_health_centers <- read_csv("/cloud/project/data/primary care providers/federally_recognized_health_centers.csv")
 
 # reformatting scraped data
 ## drop unnecessary variables
