@@ -33,7 +33,7 @@ https://data.mainepublichealth.gov/tracking/home
 ### Cleaning Script
 
 ```{r data-import-mtn-number, echo = FALSE}
-# read csv file
+# read in .csv file
 mtn_tick_town_number <- read_csv("/cloud/project/data/ticks/maine_tracking_network_incidence.csv")
 
 # reformat count variables
@@ -126,10 +126,73 @@ https://data.mainepublichealth.gov/tracking/home
 ### Cleaning Script
 
 ```{r data-import-mtn-rate, echo = FALSE}
-# read csv file
+# read in .csv file
 mtn_tick_town_rate <- read_csv("/cloud/project/data/ticks/maine_tracking_network_rate.csv")
 
 # reformat rate
 mtn_tick_town_rate[mtn_tick_town_rate == "*"] = NA
 mtn_tick_town_rate[mtn_tick_town_rate == "NR"] = NA
+```
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+## **UMaine Tick Testing Prevalence Data**
+
+### Description
+
+This data set consists of prevalence data for 6 different pathogens in ticks from 2019-2022. Data represented as totals across years. Ticks are only tested for the pathogen panel UMaine has designed for that particular species of tick. The data represents only ticks that have been sent to the UMaine labratories for testing.
+
+### Format
+
+A data frame with 917 observations and 19 variables
+
+### Data Dictionary
+
+## `umaine_tickborne_prevalence_town.csv`
+
+|variable             |class     |description |
+|:--------------------|:---------|:-----------|
+|town                 |character | Town in Maine where tick submission was sent from |
+|borrelia_percent     |character | (0-1) Positive test rate for borrelia among ticks tested for borrelia |
+|borrelia_positive    |numeric   | (0-120) Number of positive borrelia tests among ticks tested for borrelia |
+|borrelia_tests       |numeric   | (0-300) Number of ticks tested for borrelia |
+|anaplasma_percent    |character | (0-1) Positive test rate for anaplasma among ticks tested for anaplasma |
+|anaplasma_positive   |numeric   | (0-35) Number of positive anaplasma tests among ticks tested for anaplasma |
+|anaplasma_tests      |numeric   | (0-300) Number of ticks tested for anaplasma |
+|babesia_percent      |character | (0-1) Positive test rate for babesia among ticks tested for babesia |
+|babesia_positive     |numeric   | (0-24) Number of positive babesia tests among ticks tested for babesia |
+|babesia_tests        |numeric   | (0-300) Number of ticks tested for babesia |
+|ehrlichia_percent    |character | (0-1) Positive test rate for ehrlichia among ticks tested for ehrlichia |
+|ehrlichia_positive   |numeric   | (0-1) Number of positive ehrlichia tests among ticks tested for ehrlichia |
+|ehrlichia_tests      |numeric   | (0-60) Number of ticks tested for ehrlichia |
+|francisella_percent  |character | (0) Positive test rate for francisella among ticks tested for francisella |
+|francisella_positive |numeric   | (0) Number of positive francisella tests among ticks tested for francisella |
+|francisella_tests    |numeric   | (0-60) Number of ticks tested for francisella |
+|rickettsia_percent   |character | (0) Positive test rate for rickettsia among ticks tested for rickettsia |
+|rickettsia_positive  |numeric   | (0) Number of positive rickettsia tests among ticks tested for rickettsia |
+|rickettsia_tests     |numeric   | (0-60) Number of ticks tested for rickettsia |
+
+### Source
+
+https://ticktesting.umaine.edu/data/tables.php#tableDiv
+
+### Cleaning Script
+
+```{r data-import-umaine-prevalence, echo = FALSE}
+# read csv file
+tick_towns <- read_csv("/cloud/project/data/ticks/umaine_tickborne_prevalence_town.csv")
+
+# reformat location variable
+tick_towns <- tick_towns %>%
+  mutate(town = str_replace(town, "plt", "Plantation")) %>%
+  mutate(town = str_replace(town, "Plt", "Plantation")) %>%
+  mutate(town = str_replace(town, "Monhegan Island", "Monhegan")) %>%
+  mutate(town = str_replace(town, "Muscle Ridge", "Muscle Ridge Islands")) %>%
+  mutate(town = str_replace(town, "Cary Twp", "Cary Plantation")) %>%
+  mutate(town = str_replace(town, "Codyville Twp", "Codyville Plantation")) %>%
+  mutate(town = str_replace(town, "Seboomook Twp", "Seboomook Lake Twp")) %>%
+  mutate(town = str_replace(town, "Prentiss Twp T4 R4 NBKP", "Prentiss Twp")) %>%
+  mutate(town = str_replace(town, "Dennistown", "Dennis")) %>%
+  mutate(town = str_replace(town, "Saint", "St.")) %>%
+  mutate(town = str_replace(town, "Atkinson Twp", "Atkinson")) %>%
+  mutate(town = str_replace(town, "Bancroft Twp", "Bancroft")) 
 ```
