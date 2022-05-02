@@ -12,7 +12,7 @@
 <meta name="author" content="Laurie Baker and Matt Clayton" />
 
 
-<title>NeSCA Project Info Sheet</title>
+<title>Maine Ticks Project Info Sheet</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -358,9 +358,9 @@ pre code {
 
 
 
-<h1 class="title toc-ignore">NeSCA Project Info Sheet</h1>
+<h1 class="title toc-ignore">Maine Ticks Project Info Sheet</h1>
 <h4 class="author">Laurie Baker and Matt Clayton</h4>
-<h4 class="date">4/16/2022</h4>
+<h4 class="date">5/1/2022</h4>
 
 </div>
 
@@ -369,9 +369,9 @@ pre code {
 <li><a href="#community-partner-background">Community Partner
 Background</a></li>
 <li><a href="#project-overview">Project Overview</a></li>
-<li><a href="#main-data-science-questions-includes-any-key-questions-you-hope-the-challenge-will-answer.">Main
+<li><a href="#main-data-science-questions-includes-any-key-questions-you-hope-the-challenge-will-answer">Main
 data science questions (Includes any key questions you hope the
-challenge will answer).</a></li>
+challenge will answer)</a></li>
 <li><a href="#how-will-addressing-this-challenge-benefit-the-community-you-serve">How
 will addressing this challenge benefit the community you serve?</a></li>
 <li><a href="#data-sets">Data sets</a></li>
@@ -384,26 +384,75 @@ Reading</a></li>
 
 <div id="community-partner-background" class="section level2">
 <h2>Community Partner Background</h2>
+<p><strong>Dr. Susan Elias</strong></p>
+<p>Susan is a staff scientist at the Maine Medical Center Research
+Institute’s Vector-Borne Disease Laboratory with a focus in the
+following research areas:</p>
+<ol style="list-style-type: decimal">
+<li>Ecology of tick and mosquito vectors and vector-borne disease agents
+as related to climate, hosts, habitat, and human behavior</li>
+<li>Modeling environmental spatio-temporal disease risk</li>
+<li>Disease risk communication</li>
+</ol>
+<p><strong>Dr. Robert Smith</strong></p>
+<p>Rob is both the the Director of the Vector-Borne Disease Laboratory
+and the director of the Division of Infectious Disease at Maine Medical
+Center with the following research interests:</p>
+<ol style="list-style-type: decimal">
+<li>Molecular epidemiology and ecology of emergent vector-borne
+diseases</li>
+<li>Clinical recognition and diagnosis of emergent vector-borne
+diseases</li>
+</ol>
+<p><strong>Vector-Borne Disease Laboratory</strong></p>
+<p>The goal of this lab is to investigate the spread of disease-carrying
+ticks and mosquitoes in Maine and the disease agents they carry. The
+researchers in the lab also develop new strategies for tick control, and
+based on this work, inform the public about their risk and how to
+prevent it. (overview reported from <a href="https://mmcri.org/" class="uri">https://mmcri.org/</a>)</p>
 </div>
 <div id="project-overview" class="section level2">
 <h2>Project Overview</h2>
+<p>Maine has very high rates of tickborne diseases, relative to other
+states in the US. There are also many areas of Maine that are
+historically under-served when it comes to medical coverage. Using data
+from case reports, surveys, and tick submissions, we can better
+understand the spread of tickborne diseases in Maine and we can begin to
+visualize areas of Maine that are at an increased risk. In addition,
+using data on health care providers in Maine we can identify areas of
+Maine that appear to be under-served. Combining all of this data could
+ultimately be very beneficial for both Maine citizens and also for the
+public health sector.</p>
 </div>
-<div id="main-data-science-questions-includes-any-key-questions-you-hope-the-challenge-will-answer." class="section level2">
+<div id="main-data-science-questions-includes-any-key-questions-you-hope-the-challenge-will-answer" class="section level2">
 <h2>Main data science questions (Includes any key questions you hope the
-challenge will answer).</h2>
+challenge will answer)</h2>
 <ul>
 <li><p>Why do most Lyme disease cases appear to occur in mid-coast
-Maine? Could the data be skewed by reporting biases? Are there any other
-factors at play (population, outdoor recreation, age of population,
-etc…)?</p></li>
-<li><p>Are there areas of Maine that suffer from a lack of health care
-coverage? Do these under-served areas have an increased risk for getting
-sick with Lyme disease?</p></li>
+Maine? Could the data be skewed by reporting biases? What are some of
+the main factors at play (population, outdoor recreation, age of
+population, etc…)?</p></li>
+<li><p>Are there specific areas of Maine that suffer from a lack of
+health care coverage? Do these under-served areas have an increased risk
+for getting sick with Lyme disease?</p></li>
 </ul>
 </div>
 <div id="how-will-addressing-this-challenge-benefit-the-community-you-serve" class="section level2">
 <h2>How will addressing this challenge benefit the community you
 serve?</h2>
+<p>First of all, understanding historical tickborne disease data can
+help policy makers gain a better sense of how common tickborne diseases
+are in humans, and possibly what to expect in the future regarding
+tickborne diseases in Maine. How large is the risk associated with
+contracting tickborne diseases, and what areas of Maine seem to be the
+most vulnerable? This could also possibly inform policy makers to take
+preventative action against the spread of tickborne diseases.</p>
+<p>Secondly, addressing this challenge could help inform Maine citizens
+or Maine vacationers about the levels of risk in different parts of the
+state. For instance, maybe people don’t have much to worry about in or
+around Portland where there seems to be plenty of health care coverage,
+but it more rural parts of the state, should people be more
+cautious?</p>
 </div>
 <div id="data-sets" class="section level2">
 <h2>Data sets</h2>
@@ -432,8 +481,8 @@ medical practices in the state of Maine, scraped from google maps.</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>umaine_tickborne_prevalence_town.csv</code></td>
-<td align="left">1-year prevalence data for 6 different pathogens found
-in ticks (UMaine)</td>
+<td align="left">4-year prevalence data (2019-2022) for 6 different
+pathogens found in ticks (UMaine)</td>
 </tr>
 <tr class="even">
 <td align="left"><code>maine_tracking_network_incidence.csv</code></td>
@@ -446,18 +495,31 @@ Anaplasmosis, and Babesiosis cases by town (Maine CDC)</td>
 people, 2016-2020) for Lyme disease, Anaplasmosis, and Babesiosis cases
 by town (Maine CDC)</td>
 </tr>
-<tr class="even">
-<td align="left"></td>
-<td align="left"></td>
-</tr>
 </tbody>
 </table>
 </div>
 <div id="key-milestones-and-projectoutcome-partners-hope-to-achieve" class="section level2">
 <h2>Key Milestones and Project/Outcome partners hope to achieve?</h2>
+<ul>
+<li><p>Determine areas of Maine where citizens and/or vacationers are at
+the highest risk of contracting and getting seriously sick with
+tickborne diseases.</p></li>
+<li><p>Determine where cases of tickborne diseases in humans are most
+common, and whether it is likely that these areas will continue to have
+high rates of tickborne diseases.</p></li>
+<li><p>Identify some of the most important factors that impact case
+rates in Maine, and identify potential sources of biasesness in
+tickborne disease data.</p></li>
+</ul>
 </div>
 <div id="resources-and-background-reading" class="section level2">
 <h2>Resources and Background Reading</h2>
+<p><a href="https://gateway.maine.gov/cognos/cgi-bin/cognosisapi.dll?b_action=cognosViewer&amp;ui.action=run&amp;ui.object=%2fcontent%2ffolder%5B%40name%3d%27CDC%20EOHP%20EPHT%20AVR%27%5D%2freportView%5B%40name%3d%27Maine%20Environmental%20Public%20Health%20Tracking%20%28EPHT%29%20Network%20-%20Public%20Data%20Portal%27%5D&amp;cv.header=false&amp;cv.toolbar=false">Maine
+Tracking Network Tickborne Disease Data Portal</a></p>
+<p><a href="https://data.hrsa.gov/data/download?data=HSCD#HSCD">Data For
+Primary Care Shortage Areas in Maine</a> (see “Shortage Areas” tab)</p>
+<p><a href="https://www.maine.gov/dhhs/mecdc/infectious-disease/epi/vector-borne/lyme/tick-attachment-and-tickborne-diseases.shtml?msclkid=06e0a64bc9c211ec98deeac1f5ec6ba1">Overview
+of Tickborne Diseases in Maine</a> (Maine CDC)</p>
 </div>
 
 
