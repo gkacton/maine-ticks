@@ -3,7 +3,8 @@ title: "Maine Ticks Project Info Sheet"
 author: "Laurie Baker and Matt Clayton"
 date: "5/1/2022"
 output: 
-   html_document:
+   prettydoc::html_pretty:
+     theme: cayman
      toc: TRUE
      toc_depth: 2
 ---
