@@ -22,13 +22,22 @@ rates <- read_csv("data/ticks/maine_tracking_network_rate.csv")
 prevalence <- read_csv("data/ticks/umaine_tickborne_prevalence_town.csv")
 
 
-# Loading Spatial Data ----------------------------------------------------
+# Loading Spatial Data - ggplot ----------------------------------------------------
 
 ## Note: st_read works for .shp files, but the conserved lands set is only available as .kml
 
 county_boundaries <- st_read("data/spatial_data/Maine_County_Boundaries/Maine_County_Boundary_Polygons_Feature.shp")
 town_boundaries <- st_read("data/spatial_data/Maine_Town_and_Townships_Polygons/Maine_Town_and_Townships_Boundary_Polygons_Feature.shp")
 
+
+# Loading Spatial Data - leaflet ------------------------------------------
+
+county_latlon <- readOGR("data/spatial_data/Maine_County_Boundaries/Maine_County_Boundary_Polygons_Feature.shp")
+county_latlon <-spTransform(county_latlon, CRS("+proj=longlat +datum=WGS84 +no_defs")) 
+  # changes shapefile to be compatible with WGS84, so it will now work with leaflet
+
+county_latlon_df <- fortify(county_latlon) # just the lat/lon data, idk if we need it
+                                                                       
 
 # Cleaning Incidence Data -------------------------------------------------
   ## From Matt's data cleaning script 

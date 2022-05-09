@@ -24,8 +24,11 @@ town_outlines_map <- ggplot(data = town_boundaries) +
 
 # Basic Leaflet -----------------------------------------------------------
 
-county_leaflet <- leaflet(data = county_boundaries) %>% 
+county_leaflet <- leaflet(data = county_latlon) %>% 
   addTiles(group = "OSM") %>% 
-  addPolygons()
-
+  addPolygons(
+    fill = "blue",
+    stroke = "black"
+  )
+ 
 
