@@ -36,8 +36,11 @@ county_latlon <- readOGR("data/spatial_data/Maine_County_Boundaries/Maine_County
 county_latlon <-spTransform(county_latlon, CRS("+proj=longlat +datum=WGS84 +no_defs")) 
   # changes shapefile to be compatible with WGS84, so it will now work with leaflet
 
+town_latlon <- readOGR("data/spatial_data/Maine_Town_and_Townships_Polygons/Maine_Town_and_Townships_Boundary_Polygons_Feature.shp")
+town_latlon <-spTransform(town_latlon, CRS("+proj=longlat +datum=WGS84 +no_defs")) 
+
 county_latlon_df <- fortify(county_latlon) # just the lat/lon data, idk if we need it
-                                                                       
+town_latlon_df <- fortify(town_latlon)                                                                
 
 # Cleaning Incidence Data -------------------------------------------------
   ## From Matt's data cleaning script 
