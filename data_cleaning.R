@@ -66,5 +66,33 @@ tick_numbers <- incidence %>%
          anaplasmosis = as.numeric(Anaplasmosis)) %>% 
   select(Location, lyme, babesiosis, anaplasmosis, Population) 
 
-
+# reformatting location variable
+  ## From Matt's script
+mtn_tick_town_number <- mtn_tick_town_number %>%
+  mutate(Location = str_replace(Location, "Plt", "Plantation")) %>%
+  mutate(Location = str_replace(Location, "Bancroft Twp", "Bancroft")) %>%
+  mutate(Location = str_replace(Location, "Aroostook", "Aroostook Twp")) %>%
+  mutate(Location = str_replace(Location, "Somerset", "Somerset Twp")) %>%
+  mutate(Location = str_replace(Location, "East Hancock", "East Hancock Twp")) %>%
+  mutate(Location = str_replace(Location, "Dennistown", "Dennis")) %>%
+  mutate(Location = str_replace(Location, "East Central Washington", "East Central Washington Twp")) %>%
+  mutate(Location = str_replace(Location, "East Central Franklin", "East Central Franklin Twp")) %>%
+  mutate(Location = str_replace(Location, "West Central Franklin", "West Central Franklin Twp")) %>%
+  mutate(Location = str_replace(Location, "North Franklin", "North Franklin Twp")) %>%
+  mutate(Location = str_replace(Location, "South Franklin", "South Franklin Twp")) %>%
+  mutate(Location = str_replace(Location, "West Franklin", "West Franklin Twp")) %>%
+  mutate(Location = str_replace(Location, "East Central Penobscot", "East Central Penobscot Twp")) %>%
+  mutate(Location = str_replace(Location, "Louds Island", "Louds Island Twp")) %>%
+  mutate(Location = str_replace(Location, "Marshall Island", "Marshall Island Twp")) %>%
+  mutate(Location = str_replace(Location, "Monhegan Island Plantation", "Monhegan Plantation")) %>%
+  mutate(Location = str_replace(Location, "Islands", "Islands Twp")) %>%
+  mutate(Location = str_replace(Location, "North Oxford", "North Oxford Twp")) %>%
+  mutate(Location = str_replace(Location, "South Oxford", "South Oxford Twp")) %>%
+  mutate(Location = str_replace(Location, "North Washington", "North Washington Twp")) %>%
+  mutate(Location = str_replace(Location, "North Penobscot", "North Penobscot Twp")) %>%
+  mutate(Location = str_replace(Location, "Piscataquis", "Piscataquis Twp")) %>%
+  mutate(Location = str_replace(Location, "Prentiss Twp T7 R3 NBPP", "Prentiss Twp")) %>%
+  mutate(Location = str_replace(Location, "Seboomook Lake", "Seboomook Lake Twp")) %>%
+  mutate(Location = str_replace(Location, "Square Lake", "Square Lake Twp")) %>%
+  mutate(Location = str_replace(Location, "Saint", "St.")) 
 
