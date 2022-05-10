@@ -1,13 +1,14 @@
-# Leaflets
+# Data from Maine Tracking Network
+## Total number of lyme, anaplasmosis, and babesiosis cases per town, 2016-2020
 
 
-# Leaflet of Incidence Data -----------------------------------------------
+# Cases per Town -----------------------------------------------
 
 town_latlon_sf <- town_latlon %>% 
   st_as_sf() 
 
-ticknum_town_latlon <- town_latlon_sf %>% 
-  left_join(tick_numbers, by = c("TOWN" = "Location")) %>% 
+casenum_town_latlon <- town_latlon_sf %>% 
+  left_join(case_numbers, by = c("TOWN" = "Location")) %>% 
   select(-created_us, -created_da, -last_edite, -last_edi_1) %>% 
   mutate(lyme_popup = paste("<b>", TOWN, "</b>" ,
                             "<br>", "Lyme Cases: ", lyme, 
@@ -31,7 +32,7 @@ bab_fill_palette <- colorNumeric(
   palette = "Greens",
   domain = ticknum_town_latlon$babesiosis)
 
-town_ticknum_leaflet <- leaflet(data = ticknum_town_latlon) %>% 
+town_casenum_leaflet <- leaflet(data = casenum_town_latlon) %>% 
   addTiles(group = "OSM") %>% 
   addPolygons(
     group = "Lyme",
@@ -60,4 +61,9 @@ town_ticknum_leaflet <- leaflet(data = ticknum_town_latlon) %>%
   addLayersControl(
     overlayGroups = c("Lyme", "Anaplasmosis", "Babesiosis")
   )
+
+
+# Cases per County --------------------------------------------------------
+
+
  

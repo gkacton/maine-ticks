@@ -45,7 +45,7 @@ town_latlon <-spTransform(town_latlon, CRS("+proj=longlat +datum=WGS84 +no_defs"
 # Cleaning Incidence Data -------------------------------------------------
   ## From Matt's data cleaning script 
 
-tick_numbers <- incidence %>% 
+case_numbers <- incidence %>% 
   mutate(Lyme_Label = Lyme) %>%
   mutate(Lyme_Label = str_replace(Lyme_Label, "NR", "Not Releasable")) %>%
   mutate(Lyme = str_replace(Lyme, "<6", "6")) %>%
@@ -68,7 +68,7 @@ tick_numbers <- incidence %>%
 
 # reformatting location variable
   ## From Matt's script
-tick_numbers <- tick_numbers %>%
+case_numbers <- case_numbers %>%
   mutate(Location = str_replace(Location, "Plt", "Plantation")) %>%
   mutate(Location = str_replace(Location, "Bancroft Twp", "Bancroft")) %>%
   mutate(Location = str_replace(Location, "Aroostook", "Aroostook Twp")) %>%
