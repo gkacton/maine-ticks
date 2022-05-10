@@ -26,21 +26,21 @@ prevalence <- read_csv("data/ticks/umaine_tickborne_prevalence_town.csv")
 
 ## Note: st_read works for .shp files, but the conserved lands set is only available as .kml
 
-county_boundaries <- st_read("data/spatial_data/Maine_County_Boundaries/Maine_County_Boundary_Polygons_Feature.shp")
+#county_boundaries <- st_read("data/spatial_data/Maine_County_Boundaries/Maine_County_Boundary_Polygons_Feature.shp")
 town_boundaries <- st_read("data/spatial_data/Maine_Town_and_Townships_Polygons/Maine_Town_and_Townships_Boundary_Polygons_Feature.shp")
 
 
 # Loading Spatial Data - leaflet ------------------------------------------
 
-county_latlon <- readOGR("data/spatial_data/Maine_County_Boundaries/Maine_County_Boundary_Polygons_Feature.shp")
-county_latlon <-spTransform(county_latlon, CRS("+proj=longlat +datum=WGS84 +no_defs")) 
+#county_latlon <- readOGR("data/spatial_data/Maine_County_Boundaries/Maine_County_Boundary_Polygons_Feature.shp")
+#county_latlon <-spTransform(county_latlon, CRS("+proj=longlat +datum=WGS84 +no_defs")) 
   # changes shapefile to be compatible with WGS84, so it will now work with leaflet
 
 town_latlon <- readOGR("data/spatial_data/Maine_Town_and_Townships_Polygons/Maine_Town_and_Townships_Boundary_Polygons_Feature.shp")
 town_latlon <-spTransform(town_latlon, CRS("+proj=longlat +datum=WGS84 +no_defs")) 
 
-county_latlon_df <- fortify(county_latlon) # just the lat/lon data, idk if we need it
-town_latlon_df <- fortify(town_latlon)                                                                
+#county_latlon_df <- fortify(county_latlon) # just the lat/lon data, idk if we need it
+# town_latlon_df <- fortify(town_latlon)                                                                
 
 # Cleaning Incidence Data -------------------------------------------------
   ## From Matt's data cleaning script 
@@ -68,7 +68,7 @@ tick_numbers <- incidence %>%
 
 # reformatting location variable
   ## From Matt's script
-mtn_tick_town_number <- mtn_tick_town_number %>%
+tick_numbers <- tick_numbers %>%
   mutate(Location = str_replace(Location, "Plt", "Plantation")) %>%
   mutate(Location = str_replace(Location, "Bancroft Twp", "Bancroft")) %>%
   mutate(Location = str_replace(Location, "Aroostook", "Aroostook Twp")) %>%
@@ -94,5 +94,5 @@ mtn_tick_town_number <- mtn_tick_town_number %>%
   mutate(Location = str_replace(Location, "Prentiss Twp T7 R3 NBPP", "Prentiss Twp")) %>%
   mutate(Location = str_replace(Location, "Seboomook Lake", "Seboomook Lake Twp")) %>%
   mutate(Location = str_replace(Location, "Square Lake", "Square Lake Twp")) %>%
-  mutate(Location = str_replace(Location, "Saint", "St.")) 
+  mutate(Location = str_replace(Location, "Saint", "St."))
 
