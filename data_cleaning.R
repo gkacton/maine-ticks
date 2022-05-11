@@ -32,8 +32,8 @@ town_boundaries <- st_read("data/spatial_data/Maine_Town_and_Townships_Polygons/
 
 # Loading Spatial Data - leaflet ------------------------------------------
 
-#county_latlon <- readOGR("data/spatial_data/Maine_County_Boundaries/Maine_County_Boundary_Polygons_Feature.shp")
-#county_latlon <-spTransform(county_latlon, CRS("+proj=longlat +datum=WGS84 +no_defs")) 
+county_latlon <- readOGR("data/spatial_data/Maine_County_Boundaries/Maine_County_Boundary_Polygons_Feature.shp")
+county_latlon <-spTransform(county_latlon, CRS("+proj=longlat +datum=WGS84 +no_defs")) 
   # changes shapefile to be compatible with WGS84, so it will now work with leaflet
 
 town_latlon <- readOGR("data/spatial_data/Maine_Town_and_Townships_Polygons/Maine_Town_and_Townships_Boundary_Polygons_Feature.shp")
@@ -96,5 +96,5 @@ case_numbers <- case_numbers %>%
   mutate(Location = str_replace(Location, "Square Lake", "Square Lake Twp")) %>%
   mutate(Location = str_replace(Location, "Saint", "St."))
 
-town_latlon_sf <- town_latlon_sf %>% 
-  mutate(Location = str_replace(Location, "Plt", "Plantation"))
+
+
