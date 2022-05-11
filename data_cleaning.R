@@ -96,3 +96,5 @@ case_numbers <- case_numbers %>%
   mutate(Location = str_replace(Location, "Square Lake", "Square Lake Twp")) %>%
   mutate(Location = str_replace(Location, "Saint", "St."))
 
+town_latlon_sf <- town_latlon_sf %>% 
+  mutate(Location = str_replace(Location, "Plt", "Plantation"))
