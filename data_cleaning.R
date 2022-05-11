@@ -26,7 +26,7 @@ prevalence <- read_csv("data/ticks/umaine_tickborne_prevalence_town.csv")
 
 ## Note: st_read works for .shp files, but the conserved lands set is only available as .kml
 
-#county_boundaries <- st_read("data/spatial_data/Maine_County_Boundaries/Maine_County_Boundary_Polygons_Feature.shp")
+county_boundaries <- st_read("data/spatial_data/Maine_County_Boundaries/Maine_County_Boundary_Polygons_Feature.shp")
 town_boundaries <- st_read("data/spatial_data/Maine_Town_and_Townships_Polygons/Maine_Town_and_Townships_Boundary_Polygons_Feature.shp")
 
 

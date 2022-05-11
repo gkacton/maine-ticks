@@ -22,15 +22,15 @@ casenum_town_latlon <- town_latlon_sf %>%
 
 lyme_fill_palette <- colorNumeric(
   palette = "Blues",
-  domain = ticknum_town_latlon$lyme)
+  domain = casenum_town_latlon$lyme)
 
 ana_fill_palette <- colorNumeric(
   palette = "Reds",
-  domain = ticknum_town_latlon$anaplasmosis)
+  domain = casenum_town_latlon$anaplasmosis)
 
 bab_fill_palette <- colorNumeric(
   palette = "Greens",
-  domain = ticknum_town_latlon$babesiosis)
+  domain = casenum_town_latlon$babesiosis)
 
 town_casenum_leaflet <- leaflet(data = casenum_town_latlon) %>% 
   addTiles(group = "OSM") %>% 
