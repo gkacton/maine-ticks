@@ -35,12 +35,14 @@ town_boundaries <- st_read("data/spatial_data/Maine_Town_and_Townships_Polygons/
 county_latlon <- readOGR("data/spatial_data/Maine_County_Boundaries/Maine_County_Boundary_Polygons_Feature.shp")
 county_latlon <-spTransform(county_latlon, CRS("+proj=longlat +datum=WGS84 +no_defs")) 
   # changes shapefile to be compatible with WGS84, so it will now work with leaflet
+county_latlon_sf <- county_latlon %>% 
+  st_as_sf()
 
 town_latlon <- readOGR("data/spatial_data/Maine_Town_and_Townships_Polygons/Maine_Town_and_Townships_Boundary_Polygons_Feature.shp")
 town_latlon <-spTransform(town_latlon, CRS("+proj=longlat +datum=WGS84 +no_defs")) 
+town_latlon_sf <- town_latlon %>% 
+  st_as_sf() 
 
-#county_latlon_df <- fortify(county_latlon) # just the lat/lon data, idk if we need it
-# town_latlon_df <- fortify(town_latlon)                                                                
 
 # Cleaning Incidence Data -------------------------------------------------
   ## From Matt's data cleaning script 
@@ -66,7 +68,7 @@ case_numbers <- incidence %>%
          anaplasmosis = as.numeric(Anaplasmosis)) %>% 
   select(Location, lyme, babesiosis, anaplasmosis, Population) 
 
-# reformatting location variable
+# reformatting location variable in case_numbers
   ## From Matt's script
 case_numbers <- case_numbers %>%
   mutate(Location = str_replace(Location, "Plt", "Plantation")) %>%
@@ -96,5 +98,35 @@ case_numbers <- case_numbers %>%
   mutate(Location = str_replace(Location, "Square Lake", "Square Lake Twp")) %>%
   mutate(Location = str_replace(Location, "Saint", "St."))
 
+# fixing TOWN names in town_latlon_sf
 
+town_latlon_sf <- town_latlon_sf %>% 
+  mutate(TOWN = str_replace(TOWN, "Plt", "Plantation")) %>% 
+  mutate(TOWN = str_replace(TOWN, "Saint", "St.")) %>% 
+  mutate(TOWN = str_replace(TOWN, "Monhegan Island Plantation", "Monhegan Plantation")) %>% 
+  mutate(TOWN = str_replace(TOWN, "Saint George", "St. George")) %>% 
+  mutate(TOWN = str_replace(TOWN, "Matinicus Isle Plt", "Matinicus Isle Plantation")) %>% 
+  mutate(TOWN = str_replace(TOWN, "Muscle Ridge Twp", "Muscle Ridge Islands Twp")) %>% 
+  mutate(TOWN = str_replace(TOWN, "Andover North Surplus Twp", "Andover")) %>% 
+  mutate(TOWN = str_replace(TOWN, "Andover West Surplus Twp", "Andover")) %>% 
+  mutate(TOWN = str_replace(TOWN, "Magalloway Twp", "Magalloway Plantation")) %>% 
+  mutate(TOWN = str_replace(TOWN, "Lincoln County Island", "Bristol")) %>% 
+  mutate(TOWN = str_replace(TOWN, "Knox County Island", "Isleboro")) %>% 
+  mutate(TOWN = str_replace(TOWN, "Hancock County Island", "Deer Isle")) %>% 
+  mutate(TOWN = str_replace(TOWN, "T9 SD BPP", "Franklin")) %>% 
+  mutate(TOWN = str_replace(TOWN, "T7 SD BPP", "Sullivan")) %>% 
+  mutate(TOWN = str_replace(TOWN, "T10 SD BPP", "Franklin")) %>% 
+  mutate(TOWN = str_replace(TOWN, "T16 MD BPP", "Eastbrook")) %>% 
+  mutate(TOWN = str_replace(TOWN, "T22 MD BPP", "Osborn"))
 
+# Cleaning "rates" dataframe ----------------------------------------------
+
+# reformat rate
+rates[rates == "*"] = NA
+rates[rates == "NR"] = NA
+
+rates <- rates %>% 
+  mutate(lyme = as.numeric(Lyme),
+       babesiosis = as.numeric(Babesiosis),
+       anaplasmosis = as.numeric(Anaplasmosis)) %>% 
+  select(Location, lyme, babesiosis, anaplasmosis, Population) 
