@@ -1,6 +1,3 @@
-
-# Run data_cleaning.R -----------------------------------------------------
-
 source("data_cleaning.R")
 
 # Cases per Town -----------------------------------------------
@@ -48,26 +45,24 @@ ana_cases_fill_palette <- colorNumeric(
   domain = casenum_town_latlon$anaplasmosis)
 
 bab_cases_fill_palette <- colorNumeric(
-  palette = "Greens",
+  palette = "Purples",
   domain = casenum_town_latlon$babesiosis)
 
 
 # Create color palette for each disease - rates ---------------------------
 
-lyme_rates_fill_palette <- colorQuantile(
+## log scale colors???
+lyme_rates_fill_palette <- colorNumeric(
   palette = "Blues", 
-  domain = rates_town_latlon$lyme, 
-  n = 16)
+  domain = rates_town_latlon$lyme)
 
-ana_rates_fill_palette <- colorQuantile(
+ana_rates_fill_palette <- colorNumeric(
   palette = "Reds", 
-  domain = rates_town_latlon$anaplasmosis, 
-  n = 8)
+  domain = rates_town_latlon$anaplasmosis)
 
-bab_rates_fill_palette <- colorQuantile(
-  palette = "Greens", 
-  domain = rates_town_latlon$babesiosis, 
-  n = 8)
+bab_rates_fill_palette <- colorNumeric(
+  palette = "Purples", 
+  domain = rates_town_latlon$babesiosis)
 
 
 
@@ -77,9 +72,20 @@ town_leaflet <- leaflet() %>%
   # base map = Open Street Map
   addTiles(group = "OSM") %>% 
   # Separate pane for each set of polygons/polylines
-  addMapPane("cases", zIndex = 410) %>%
-  addMapPane("borders", zIndex = 430) %>% # borders always on top
-  addMapPane("rates", zIndex = 420) %>% 
+  addMapPane("cases", zIndex = 420) %>%
+  addMapPane("borders", zIndex = 440) %>% # borders always on top
+  addMapPane("rates", zIndex = 430) %>% 
+  addMapPane("conservation", zIndex = 410) %>% 
+  # add polygons for conserved lands
+  addPolygons(
+    data = conserved_lands_sf,
+    group = "Conservation Lands",
+    fillColor = "green",
+    color = "green",
+    fillOpacity = 0.8,
+    weight = 1,
+    options = leafletOptions(pane = "conservation")
+  ) %>% 
   # add borders of counties
   addPolylines(
     data = county_latlon_sf,
@@ -96,7 +102,7 @@ town_leaflet <- leaflet() %>%
     fillColor = ~lyme_cases_fill_palette(lyme),
     color = ~lyme_cases_fill_palette(lyme),
     weight = 1,
-    fillOpacity = 0.8,
+    fillOpacity = 0.5,
     popup = ~lyme_popup,
     options = leafletOptions(pane = "cases")
   ) %>% 
@@ -106,7 +112,7 @@ town_leaflet <- leaflet() %>%
     fillColor = ~ana_cases_fill_palette(anaplasmosis),
     color = ~ana_cases_fill_palette(anaplasmosis),
     weight = 1,
-    fillOpacity = 0.8,
+    fillOpacity = 0.5,
     popup = ~ana_popup,
     options = leafletOptions(pane = "cases")
   ) %>%
@@ -116,7 +122,7 @@ town_leaflet <- leaflet() %>%
     fillColor = ~bab_cases_fill_palette(babesiosis),
     color = ~bab_cases_fill_palette(babesiosis),
     weight = 1,
-    fillOpacity = 0.8,
+    fillOpacity = 0.5,
     popup = ~bab_popup,
     options = leafletOptions(pane = "cases")
   ) %>% 
@@ -127,7 +133,7 @@ town_leaflet <- leaflet() %>%
     fillColor = ~lyme_rates_fill_palette(lyme),
     color = ~lyme_rates_fill_palette(lyme),
     weight = 1,
-    fillOpacity = 0.8,
+    fillOpacity = 0.5,
     popup = ~lyme_popup,
     options = leafletOptions(pane = "rates")
     ) %>% 
@@ -137,7 +143,7 @@ town_leaflet <- leaflet() %>%
     fillColor = ~ana_rates_fill_palette(anaplasmosis),
     color = ~ana_rates_fill_palette(anaplasmosis),
     weight = 1,
-    fillOpacity = 0.8,
+    fillOpacity = 0.5,
     popup = ~ana_popup,
     options = leafletOptions(pane = "rates")
     ) %>%  
@@ -147,11 +153,12 @@ town_leaflet <- leaflet() %>%
     fillColor = ~bab_rates_fill_palette(babesiosis),
     color = ~bab_rates_fill_palette(babesiosis),
     weight = 1,
-    fillOpacity = 0.8,
+    fillOpacity = 0.5,
     popup = ~bab_popup,
     options = leafletOptions(pane = "rates")
     ) %>%  
   addLayersControl(
+    baseGroups = c("Conservation Lands"),
     overlayGroups = c("Total Lyme Cases", 
                       "Total Anaplasmosis Cases", 
                       "Total Babesiosis Cases",

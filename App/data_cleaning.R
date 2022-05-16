@@ -43,6 +43,13 @@ town_latlon <-spTransform(town_latlon, CRS("+proj=longlat +datum=WGS84 +no_defs"
 town_latlon_sf <- town_latlon %>% 
   st_as_sf() 
 
+conserved_lands_sf <- read_sf("data/spatial_data/Maine_Conserved_Lands.kml")
+
+
+# Loading Provider Data ---------------------------------------------------
+
+fed_healthcenters <- read_csv("data/primary_care/federally_recognized_health_centers.csv")
+
 
 # Cleaning Incidence Data -------------------------------------------------
   ## From Matt's data cleaning script 
@@ -111,7 +118,7 @@ town_latlon_sf <- town_latlon_sf %>%
   mutate(TOWN = str_replace(TOWN, "Andover West Surplus Twp", "Andover")) %>% 
   mutate(TOWN = str_replace(TOWN, "Magalloway Twp", "Magalloway Plantation")) %>% 
   mutate(TOWN = str_replace(TOWN, "Lincoln County Island", "Bristol")) %>% 
-  mutate(TOWN = str_replace(TOWN, "Knox County Island", "Isleboro")) %>% 
+  mutate(TOWN = str_replace(TOWN, "Knox County Island", "Islesboro")) %>% 
   mutate(TOWN = str_replace(TOWN, "Hancock County Island", "Deer Isle")) %>% 
   mutate(TOWN = str_replace(TOWN, "T9 SD BPP", "Franklin")) %>% 
   mutate(TOWN = str_replace(TOWN, "T7 SD BPP", "Sullivan")) %>% 
