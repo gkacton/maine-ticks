@@ -1,6 +1,6 @@
 library(shiny)
 library(leaflet)
-# source("leaflet_cases_rates.R")
+source("leaflet_cases_rates.R")
 
 # Define UI ---------------------------------------------------------------
 
