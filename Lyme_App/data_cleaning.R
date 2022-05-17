@@ -48,7 +48,7 @@ conserved_lands_sf <- read_sf("data/spatial_data/Maine_Conserved_Lands.kml")
 
 # Loading Provider Data ---------------------------------------------------
 
-fed_healthcenters <- read_csv("data/primary_care/federally_recognized_health_centers.csv")
+# fed_healthcenters <- read_csv("data/primary_care/federally_recognized_health_centers.csv")
 
 
 # Cleaning Incidence Data -------------------------------------------------

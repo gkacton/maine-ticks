@@ -1,4 +1,14 @@
-source("data_cleaning.R")
+#
+# This is a Shiny web application. You can run the application by clicking
+# the 'Run App' button above.
+#
+# Find out more about building applications with Shiny here:
+#
+#    http://shiny.rstudio.com/
+#
+
+library(shiny)
+library(leaflet)
 
 # Cases per Town -----------------------------------------------
 # Data from Maine Tracking Network
@@ -15,7 +25,7 @@ casenum_town_latlon <- town_latlon_sf %>%
                            "<br>", "County: ", COUNTY)) %>% 
   mutate(bab_popup = paste("<b>", TOWN, "</b>" ,
                            "<br>", "Babesiosis Cases: ", babesiosis, 
-                           "<br>", "County: ", COUNTY))
+                           "<br>", "County: ", COUNTY)) 
 
 # Rates by Town --------------------------------------------------
 # Data from Maine Tracking Network
@@ -136,7 +146,7 @@ town_leaflet <- leaflet() %>%
     fillOpacity = 0.5,
     popup = ~lyme_popup,
     options = leafletOptions(pane = "rates")
-    ) %>% 
+  ) %>% 
   addPolygons(
     data = rates_town_latlon,
     group = "Anaplasmosis Rates",
@@ -146,7 +156,7 @@ town_leaflet <- leaflet() %>%
     fillOpacity = 0.5,
     popup = ~ana_popup,
     options = leafletOptions(pane = "rates")
-    ) %>%  
+  ) %>%  
   addPolygons(
     data = rates_town_latlon,
     group = "Babesiosis Rates",
@@ -156,7 +166,7 @@ town_leaflet <- leaflet() %>%
     fillOpacity = 0.5,
     popup = ~bab_popup,
     options = leafletOptions(pane = "rates")
-    ) %>%  
+  ) %>%  
   addLayersControl(
     baseGroups = c("Conservation Lands"),
     overlayGroups = c("Total Lyme Cases", 
@@ -165,9 +175,19 @@ town_leaflet <- leaflet() %>%
                       "Lyme Rates",
                       "Anaplasmosis Rates",
                       "Babesiosis Rates")
-    )
+  )
 
+ui <- fluidPage(
+  leafletOutput("mymap"),
+  p(),
+  actionButton("recalc", "New points")
+)
 
+server <- function(input, output, session) {
+  
+  output$mymap <- renderLeaflet({
+    town_leaflet
+  })
+}
 
-
- 
+shinyApp(ui, server)
