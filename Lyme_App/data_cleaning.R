@@ -39,7 +39,7 @@ county_latlon <-spTransform(county_latlon, CRS("+proj=longlat +datum=WGS84 +no_d
 county_latlon_sf <- county_latlon %>% 
   st_as_sf()
 
-town_latlon <- readOGR("data/spatial_data/Maine_Town_and_Townships_Polygons/Maine_Town_and_Townships_Boundary_Polygons_Feature.shp")
+town_latlon <- readOGR("https://github.com/gkacton/maine-ticks/blob/main/Lyme_App/data/spatial_data/Maine_Town_and_Townships_Polygons/Maine_Town_and_Townships_Boundary_Polygons_Feature.shp")
 town_latlon <-spTransform(town_latlon, CRS("+proj=longlat +datum=WGS84 +no_defs")) 
 town_latlon_sf <- town_latlon %>% 
   st_as_sf() 
