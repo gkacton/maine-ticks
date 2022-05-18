@@ -2,6 +2,7 @@
 # Loading Packages --------------------------------------------------------
 
 library(tidyverse) ## dplyr, etc.
+library(dplyr)
 library(lubridate) ## helps with dates, might not be necessary
 library(skimr) ## skim
 library(magrittr) ## pipes
