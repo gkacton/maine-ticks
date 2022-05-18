@@ -18,24 +18,24 @@ library(rgdal)
 
 # Loading Preliminary Data ------------------------------------------------------------
 
-incidence <- read_csv("Lyme_Cases_App/data/ticks/maine_tracking_network_incidence.csv")
-rates <- read_csv("Lyme_Cases_App/data/ticks/maine_tracking_network_rate.csv")
-prevalence <- read_csv("Lyme_Cases_App/data/ticks/umaine_tickborne_prevalence_town.csv")
+incidence <- read_csv("data/ticks/maine_tracking_network_incidence.csv")
+rates <- read_csv("data/ticks/maine_tracking_network_rate.csv")
+prevalence <- read_csv("data/ticks/umaine_tickborne_prevalence_town.csv")
 
 # Loading Spatial Data - leaflet ------------------------------------------
 
-county_latlon <- readOGR("Lyme_Cases_App/data/spatial_data/counties/Maine_County_Boundary_Polygons_Feature.shp")
+county_latlon <- readOGR("data/spatial_data/counties/Maine_County_Boundary_Polygons_Feature.shp")
 county_latlon <-spTransform(county_latlon, CRS("+proj=longlat +datum=WGS84 +no_defs")) 
   # changes shapefile to be compatible with WGS84, so it will now work with leaflet
 county_latlon_sf <- county_latlon %>% 
   st_as_sf()
 
-town_latlon <- readOGR("Lyme_Cases_App/data/spatial_data/towns/towns.shp")
+town_latlon <- readOGR("data/spatial_data/towns/towns.shp")
 town_latlon <-spTransform(town_latlon, CRS("+proj=longlat +datum=WGS84 +no_defs")) 
 town_latlon_sf <- town_latlon %>% 
   st_as_sf() 
 
-conserved_lands_sf <- read_sf("Lyme_Cases_App/data/spatial_data/Maine_Conserved_Lands.kml")
+conserved_lands_sf <- read_sf("data/spatial_data/Maine_Conserved_Lands.kml")
 
 
 # Loading Provider Data ---------------------------------------------------
@@ -65,7 +65,8 @@ case_numbers <- incidence %>%
   mutate(lyme = as.numeric(Lyme),
          babesiosis = as.numeric(Babesiosis),
          anaplasmosis = as.numeric(Anaplasmosis)) %>% 
-  select(Location, lyme, babesiosis, anaplasmosis, Population) 
+  select(Location, lyme, babesiosis, anaplasmosis, Population) %>% 
+  arrange(desc(lyme))
 
 # reformatting location variable in case_numbers
   ## From Matt's script
