@@ -9,6 +9,7 @@
 
 library(shiny)
 library(leaflet)
+source("data_cleaning.R")
 
 # Cases per Town -----------------------------------------------
 # Data from Maine Tracking Network
@@ -80,7 +81,8 @@ bab_rates_fill_palette <- colorNumeric(
 
 town_leaflet <- leaflet() %>% 
   # base map = Open Street Map
-  addTiles(group = "OSM") %>% 
+  addTiles(group = "OpenStreetMap") %>% 
+  addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") %>% 
   # Separate pane for each set of polygons/polylines
   addMapPane("cases", zIndex = 420) %>%
   addMapPane("borders", zIndex = 440) %>% # borders always on top
@@ -168,7 +170,9 @@ town_leaflet <- leaflet() %>%
     options = leafletOptions(pane = "rates")
   ) %>%  
   addLayersControl(
-    baseGroups = c("Conservation Lands"),
+    baseGroups = c("Conservation Lands",
+                   "Black and White",
+                   "OpenStreetMap"),
     overlayGroups = c("Total Lyme Cases", 
                       "Total Anaplasmosis Cases", 
                       "Total Babesiosis Cases",
@@ -178,9 +182,18 @@ town_leaflet <- leaflet() %>%
   )
 
 ui <- fluidPage(
-  leafletOutput("mymap"),
-  p(),
-  actionButton("recalc", "New points")
+  titlePanel("Tickborne Illnesses in Maine "),
+  
+  sidebarLayout(
+    sidebarPanel(
+      "Input a Town"
+      # will eventually have town inputs
+    ),
+    mainPanel(
+      leafletOutput("mymap")
+    )
+  )
+
 )
 
 server <- function(input, output, session) {
