@@ -15,6 +15,7 @@ library(kableExtra) ## Table output
 library(ggmap) ## for google geocoding and fortifying 
 library(maptools) ## for reading KML files
 library(rgdal)
+library(mapshaper)
 
 # Loading Preliminary Data ------------------------------------------------------------
 
@@ -28,12 +29,15 @@ county_latlon <- readOGR("data/spatial_data/counties/Maine_County_Boundary_Polyg
 county_latlon <-spTransform(county_latlon, CRS("+proj=longlat +datum=WGS84 +no_defs")) 
   # changes shapefile to be compatible with WGS84, so it will now work with leaflet
 county_latlon_sf <- county_latlon %>% 
-  st_as_sf()
+  st_as_sf() %>% 
+  rmapshaper::ms_simplify(explode = TRUE, weighting = 0.3)
+  
 
 town_latlon <- readOGR("data/spatial_data/towns/towns.shp")
 town_latlon <-spTransform(town_latlon, CRS("+proj=longlat +datum=WGS84 +no_defs")) 
 town_latlon_sf <- town_latlon %>% 
-  st_as_sf() 
+  st_as_sf() %>% 
+  rmapshaper::ms_simplify(explode = TRUE, weighting = 0.5)
 
 conserved_lands_sf <- read_sf("data/spatial_data/Maine_Conserved_Lands.kml")
 
