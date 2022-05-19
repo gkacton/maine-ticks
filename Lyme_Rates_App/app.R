@@ -52,7 +52,6 @@ bab_rates_fill_palette <- colorNumeric(
 town_leaflet <- leaflet() %>% 
   # base map = Open Street Map
   addTiles(group = "OpenStreetMap") %>% 
-  addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") %>% 
   # Separate pane for each set of polygons/polylines
   # addMapPane("cases", zIndex = 420) %>%
   addMapPane("borders", zIndex = 440) %>% # borders always on top
@@ -109,34 +108,59 @@ town_leaflet <- leaflet() %>%
     options = leafletOptions(pane = "rates")
   ) %>%  
   addLayersControl(
-    baseGroups = c("Conservation Lands",
-                   "Black and White",
-                   "OpenStreetMap"),
     overlayGroups = c("Lyme Rates",
                       "Anaplasmosis Rates",
                       "Babesiosis Rates")
   )
 
+# define UI ---------------------------------------------------------------
+
+
 ui <- fluidPage(
-  titlePanel("Tickborne Illnesses in Maine "),
+  titlePanel("Tickborne Illnesses in Maine - Rates per 100,000 Population"),
   
   sidebarLayout(
     sidebarPanel(
-      "Input a Town"
-      # will eventually have town inputs
+      selectInput("town", label = h3("Select a Town"), 
+                  choices = case_numbers$Location, 
+                  selected = "Abbot")
     ),
     mainPanel(
-      leafletOutput("mymap")
+      tabsetPanel(
+        tabPanel("Map", 
+                 leafletOutput("mymap")),
+        tabPanel("Table",
+                 tableOutput("table")
+        )
+      )
+      
     )
   )
-
+  
 )
 
 server <- function(input, output, session) {
   
   output$mymap <- renderLeaflet({
-    town_leaflet
+    town_leaflet %>% 
+      addMapPane("highlight", zIndex = 500) %>% 
+      addPolylines(
+        options = leafletOptions(pane = "highlight"),
+        data = rates_town_latlon %>% filter(TOWN == input$town),
+        color = "yellow",
+        weight = 2,
+        opacity = 1
+      )
   })
+  output$town <- renderPrint({ input$town })
+  output$table <- function(){ 
+    kbl(rates) %>% 
+      kable_material(c("striped", "hover")) %>% 
+      kable_styling(fixed_thead = T, 
+                    bootstrap_options = "striped", 
+                    font_size = 10) %>% 
+      row_spec(which(rates$Location == input$town), color = "white", background = "blue")
+  }
 }
 
 shinyApp(ui, server)

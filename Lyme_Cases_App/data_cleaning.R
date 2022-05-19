@@ -15,7 +15,7 @@ library(kableExtra) ## Table output
 library(ggmap) ## for google geocoding and fortifying 
 library(maptools) ## for reading KML files
 library(rgdal)
-library(mapshaper)
+library(rmapshaper)
 
 # Loading Preliminary Data ------------------------------------------------------------
 

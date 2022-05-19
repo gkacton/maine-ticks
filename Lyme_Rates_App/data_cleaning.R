@@ -1,3 +1,4 @@
+# RATES LEAFLET
 
 # Loading Packages --------------------------------------------------------
 
@@ -15,6 +16,7 @@ library(kableExtra) ## Table output
 library(ggmap) ## for google geocoding and fortifying 
 library(maptools) ## for reading KML files
 library(rgdal)
+library(rmapshaper)
 
 # Loading Preliminary Data ------------------------------------------------------------
 
@@ -37,12 +39,14 @@ county_latlon <- readOGR("data/spatial_data/Maine_County_Boundaries/Maine_County
 county_latlon <-spTransform(county_latlon, CRS("+proj=longlat +datum=WGS84 +no_defs")) 
   # changes shapefile to be compatible with WGS84, so it will now work with leaflet
 county_latlon_sf <- county_latlon %>% 
-  st_as_sf()
+  st_as_sf() %>% 
+  rmapshaper::ms_simplify(explode = TRUE, weighting = 0.3)
 
 town_latlon <- readOGR("data/spatial_data/Maine_Town_and_Townships_Polygons/Maine_Town_and_Townships_Boundary_Polygons_Feature.shp")
 town_latlon <-spTransform(town_latlon, CRS("+proj=longlat +datum=WGS84 +no_defs")) 
 town_latlon_sf <- town_latlon %>% 
-  st_as_sf() 
+  st_as_sf() %>% 
+  rmapshaper::ms_simplify(explode = TRUE, weighting = 0.5)
 
 conserved_lands_sf <- read_sf("data/spatial_data/Maine_Conserved_Lands.kml")
 
