@@ -52,7 +52,6 @@ bab_rates_fill_palette <- colorNumeric(
 town_leaflet <- leaflet() %>% 
   # base map = Open Street Map
   addTiles(group = "OpenStreetMap") %>% 
-  addProviderTiles(providers$Stamen.TonerLite, group = "Toner Lite") %>% 
   # Separate pane for each set of polygons/polylines
   # addMapPane("cases", zIndex = 420) %>%
   addMapPane("borders", zIndex = 440) %>% # borders always on top
@@ -109,9 +108,6 @@ town_leaflet <- leaflet() %>%
     options = leafletOptions(pane = "rates")
   ) %>%  
   addLayersControl(
-    baseGroups = c("Conservation Lands",
-                   "Black and White",
-                   "OpenStreetMap"),
     overlayGroups = c("Lyme Rates",
                       "Anaplasmosis Rates",
                       "Babesiosis Rates")
