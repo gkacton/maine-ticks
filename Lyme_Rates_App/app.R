@@ -123,7 +123,7 @@ ui <- fluidPage(
     sidebarPanel(
       selectInput("town", label = h3("Select a Town"), 
                   choices = case_numbers$Location, 
-                  selected = "Abbot")
+                  selected = "Portland"),
     ),
     mainPanel(
       tabsetPanel(
