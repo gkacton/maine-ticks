@@ -36,7 +36,25 @@ conserved_lands_sf <- read_sf("data/spatial_data/Maine_Conserved_Lands.kml")
 
 # Loading Provider Data ---------------------------------------------------
 
-# fed_healthcenters <- read_csv("data/primary_care/federally_recognized_health_centers.csv")
+fed_healthcenters <- read_csv("data/primary_care/federally_recognized_health_centers.csv")
+
+fed_health <- fed_healthcenters %>% 
+  select(`Site Name`,
+         `Site Address`,
+         `Site City`,
+         `Site Telephone Number`,
+         `Site Web Address`,
+         `County Equivalent Name`,
+         `Geocoding Artifact Address Primary X Coordinate`,
+         `Geocoding Artifact Address Primary Y Coordinate`
+         ) %>% 
+  mutate(lon = `Geocoding Artifact Address Primary X Coordinate`,
+         lat = `Geocoding Artifact Address Primary Y Coordinate`) %>% 
+  mutate(popup = paste("<b>", `Site Name`, "</b>" ,
+                       "<br>", "Address: ", `Site Address`,", ", `Site City`,", ", `County Equivalent Name`, " County", 
+                       "<br>", "Phone Number: ", `Site Telephone Number`,
+                       "<br>", "Website: ", `Site Web Address`
+                       ))
 
 # Cleaning "rates" dataframe ----------------------------------------------
 

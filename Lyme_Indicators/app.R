@@ -11,6 +11,7 @@
 library(shiny)
 library(leaflet)
 source("data_cleaning.R")
+source("census_dataprep.R")
 
 # Rates by Town --------------------------------------------------
 # Data from Maine Tracking Network
@@ -35,14 +36,29 @@ lyme_rates_fill_palette <- colorNumeric(
     palette = "Blues", 
     domain = rates$color_values)
 
+
+# Color palette for income ------------------------------------------------
+
+income_palette <- colorNumeric(
+  palette = "YlGn",
+  domain = income$med_income
+)
+
+
+# define hospital marker --------------------------------------------------
+
+hospitalMarker <- makeIcon(
+  iconUrl = "http://cdn.onlinewebfonts.com/svg/img_493605.png",
+  iconWidth = 20
+)
 # Create leaflet ----------------------------------------------------------
 
 town_leaflet <- leaflet() %>% 
     # base map = Open Street Map
     addTiles(group = "OpenStreetMap") %>% 
     # Separate pane for each set of polygons/polylines
-    # addMapPane("cases", zIndex = 420) %>%
-    addMapPane("borders", zIndex = 440) %>% # borders always on top
+    addMapPane("income", zIndex = 440) %>%
+    addMapPane("borders", zIndex = 450) %>% # borders always on top
     addMapPane("rates", zIndex = 430) %>% 
     addMapPane("conservation", zIndex = 410) %>% 
     # add polygons for conserved lands
@@ -64,6 +80,17 @@ town_leaflet <- leaflet() %>%
         weight = 1,
         options = leafletOptions(pane = "borders")
     ) %>% 
+    # add counties, colored by median income 
+    addPolygons(
+      data = income,
+      group = "Median Income",
+      fillColor = ~income_palette(med_income),
+      color = ~income_palette(med_income),
+      fillOpacity = 0.8,
+      weight = 1,
+      options = leafletOptions(pane = "income"),
+      popup = ~income_popup
+    ) %>% 
     # add towns, colored by rates per 100,000 for each disease
     addPolygons(
         data = rates_town_latlon,
@@ -74,7 +101,20 @@ town_leaflet <- leaflet() %>%
         fillOpacity = 0.5,
         popup = ~lyme_popup,
         options = leafletOptions(pane = "rates")
-    ) 
+    )  %>% 
+    # add markers for federal healthcare centers
+    addMarkers(
+      data = fed_health,
+      lat = ~lat,
+      lng = ~lon,
+      icon = hospitalMarker,
+      popup = ~popup,
+      group = "Federally Recognized Healthcare Centers" 
+    ) %>% 
+    addLayersControl(
+      overlayGroups = "Median Income",
+                      "Federally Recognized Healthcare Centers"
+    )
 
 
 # define UI ---------------------------------------------------------------
@@ -85,7 +125,7 @@ ui <- fluidPage(
     sidebarLayout(
         sidebarPanel(
             selectInput("town", label = h3("Select a Town"), 
-                        choices = case_numbers$Location, 
+                        choices = rates$Location, 
                         selected = "Portland"),
         ),
         mainPanel(
