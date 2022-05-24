@@ -10,16 +10,26 @@
 
 library(shiny)
 library(leaflet)
-source("data_cleaning.R")
-source("census_dataprep.R")
+
+
+# Load Data ---------------------------------------------------------------
+
+rates <- read_csv("clean_data/rates.csv")
+fed_health <- read_csv("clean_data/fed_health.csv")
+elderly_pop <- read_sf("clean_data/elderly_pct.shp")
+income <- read_sf("clean_data/income.shp")
+town_latlon_sf <- read_sf("clean_data/town_latlon.shp")
+county_latlon_sf <- read_sf("clean_data/county_latlon.shp") 
+conserved_lands_sf <- read_sf("clean_data/Maine_Conserved_Lands.kml")
 
 # Rates by Town --------------------------------------------------
 # Data from Maine Tracking Network
 ## Cases per 100,000 population for lyme, anaplasmosis, and babesiosis
 
 rates <- rates %>% 
-    mutate(color_values = case_when(lyme != 0 ~ log(lyme, base = 1.2),
-                                    lyme == 0 ~ 0) )
+    mutate(color_values = case_when(lyme != 0 ~ log(lyme, base = 1.1),
+                                    lyme == 0 ~ 0) ) %>% 
+    arrange(desc(lyme))
 
 rates_town_latlon <- town_latlon_sf %>% 
     left_join(rates, by = c("TOWN" = "Location")) %>% 
@@ -31,7 +41,7 @@ rates_town_latlon <- town_latlon_sf %>%
 
 # Create color palette for each disease - rates ---------------------------
 
-## log scale colors???
+## log scaled colors
 lyme_rates_fill_palette <- colorNumeric(
     palette = "Blues", 
     domain = rates$color_values)
@@ -41,7 +51,7 @@ lyme_rates_fill_palette <- colorNumeric(
 
 income_palette <- colorNumeric(
   palette = "YlGn",
-  domain = income$med_income
+  domain = income$med_ncm
 )
 
 
@@ -49,7 +59,7 @@ income_palette <- colorNumeric(
 
 age_palette <- colorNumeric(
   palette = "YlGn",
-  domain = elderly_pop$pct_elderly
+  domain = elderly_pop$pct_ldr
 )
 
 
@@ -71,7 +81,7 @@ town_leaflet <- leaflet() %>%
     addMapPane("conservation", zIndex = 410) %>% 
     # add polygons for conserved lands
     addPolygons(
-        data = conserved_lands_sf,
+        data = conserved_lands_sf$geometry,
         group = "Conservation Lands",
         fillColor = "green",
         color = "green",
@@ -81,7 +91,7 @@ town_leaflet <- leaflet() %>%
     ) %>% 
     # add borders of counties
     addPolylines(
-        data = county_latlon_sf,
+        data = county_latlon_sf$geometry,
         group = "County Boundaries",
         color = "black",
         fillOpacity = 0,
@@ -92,23 +102,23 @@ town_leaflet <- leaflet() %>%
     addPolygons(
       data = income,
       group = "Median Income",
-      fillColor = ~income_palette(med_income),
-      color = ~income_palette(med_income),
+      fillColor = ~income_palette(med_ncm),
+      color = ~income_palette(med_ncm),
       fillOpacity = 0.8,
       weight = 1,
       options = leafletOptions(pane = "indicators"),
-      popup = ~income_popup
+      popup = ~incm_pp
     ) %>% 
     # add counties, colored by percent 65+ 
     addPolygons(
       data = elderly_pop,
       group = "Percent 65+",
-      fillColor = ~age_palette(pct_elderly),
-      color = ~age_palette(pct_elderly),
+      fillColor = ~age_palette(pct_ldr),
+      color = ~age_palette(pct_ldr),
       fillOpacity = 0.7,
       weight = 1,
-      options = leafletOptions(pane = "indicators")
-      # add popup
+      options = leafletOptions(pane = "indicators"),
+      popup = ~popup
     ) %>% 
     # add towns, colored by rates per 100,000 for each disease
     addPolygons(
@@ -179,6 +189,10 @@ server <- function(input, output, session) {
     })
     output$town <- renderPrint({ input$town })
     output$table <- function(){ 
+        county_input <- rates_town_latlon$COUNTY[rates_town_latlon$TOWN==input$town]
+        county_rates <- rates %>% 
+          filter(county == county_input) %>% 
+          arrange(desc(lyme))
         kbl(rates) %>% 
             kable_material(c("striped", "hover")) %>% 
             kable_styling(fixed_thead = T, 

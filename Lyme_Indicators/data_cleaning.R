@@ -22,12 +22,12 @@ rates <- read_csv("data/ticks/maine_tracking_network_rate.csv")
 # Loading Spatial Data - leaflet ------------------------------------------
 
 county_latlon <- read_sf("data/spatial_data/Maine_County_Boundaries/Maine_County_Boundary_Polygons_Feature.shp")
-county_latlon_sf <- county_latlon %>% 
+county_latlon <- county_latlon %>% 
   st_transform(crs = "WGS84") %>% 
   rmapshaper::ms_simplify(explode = TRUE, weighting = 0.3)
 
 town_latlon <- read_sf("data/spatial_data/towns/towns.shp")
-town_latlon_sf <- town_latlon %>% 
+town_latlon <- town_latlon %>% 
   st_transform(crs = "WGS84") %>% 
   rmapshaper::ms_simplify(explode = TRUE, weighting = 0.5)
 
@@ -88,3 +88,11 @@ town_latlon_sf <- town_latlon_sf %>%
   mutate(TOWN = str_replace(TOWN, "T10 SD BPP", "Franklin")) %>% 
   mutate(TOWN = str_replace(TOWN, "T16 MD BPP", "Eastbrook")) %>% 
   mutate(TOWN = str_replace(TOWN, "T22 MD BPP", "Osborn"))
+
+
+# write to new data files -------------------------------------------------
+write_csv(rates, file = "clean_data/rates.csv")
+write_csv(fed_health, file = "clean_data/fed_health.csv")
+write_sf(town_latlon_sf, dsn = "clean_data/town_latlon.shp")
+write_sf(county_latlon_sf, dsn = "clean_data/county_latlon.shp")
+

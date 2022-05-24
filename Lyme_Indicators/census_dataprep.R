@@ -33,11 +33,10 @@ income <- income %>%
                          ))) %>% 
   mutate(med_income = as.numeric(gsub(",", "", med_income)))  %>%
   right_join(county_latlon_sf, by = c("county" = "COUNTY")) %>% 
-  st_as_sf() %>% 
   mutate(income_popup = paste("<b>", county, "</b>" ,
-                               "<br>", "Median Income: ", med_income))
-
-
+                              "<br>", "Median Income: ", med_income)) %>% 
+  st_as_sf() 
+  
 # reformat age set --------------------------------------------------------
 
 total_pop <- age_insured %>% 
@@ -93,6 +92,13 @@ elderly_pop <- age_insured %>%
   mutate(pct_elderly = (elderly / total) * 100) %>% 
   filter(county != "Maine (total)") %>% 
   right_join(county_latlon_sf, by = c("county" = "COUNTY")) %>% 
-  st_as_sf()
+  mutate(popup = paste("<b>", county, "</b>",
+                       "<br>", "Percent of population over age 65:", pct_elderly)) %>% 
+  st_as_sf() 
 
 
+
+# write to new files ------------------------------------------------------
+
+write_sf(elderly_pop, "clean_data/elderly_pct.shp")
+write_sf(income, "clean_data/income.shp")
