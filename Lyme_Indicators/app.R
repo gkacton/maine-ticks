@@ -45,6 +45,14 @@ income_palette <- colorNumeric(
 )
 
 
+# color palette for age ---------------------------------------------------
+
+age_palette <- colorNumeric(
+  palette = "YlGn",
+  domain = elderly_pop$pct_elderly
+)
+
+
 # define hospital marker --------------------------------------------------
 
 hospitalMarker <- makeIcon(
@@ -57,7 +65,7 @@ town_leaflet <- leaflet() %>%
     # base map = Open Street Map
     addTiles(group = "OpenStreetMap") %>% 
     # Separate pane for each set of polygons/polylines
-    addMapPane("income", zIndex = 440) %>%
+    addMapPane("indicators", zIndex = 440) %>%
     addMapPane("borders", zIndex = 450) %>% # borders always on top
     addMapPane("rates", zIndex = 430) %>% 
     addMapPane("conservation", zIndex = 410) %>% 
@@ -88,8 +96,19 @@ town_leaflet <- leaflet() %>%
       color = ~income_palette(med_income),
       fillOpacity = 0.8,
       weight = 1,
-      options = leafletOptions(pane = "income"),
+      options = leafletOptions(pane = "indicators"),
       popup = ~income_popup
+    ) %>% 
+    # add counties, colored by percent 65+ 
+    addPolygons(
+      data = elderly_pop,
+      group = "Percent 65+",
+      fillColor = ~age_palette(pct_elderly),
+      color = ~age_palette(pct_elderly),
+      fillOpacity = 0.7,
+      weight = 1,
+      options = leafletOptions(pane = "indicators")
+      # add popup
     ) %>% 
     # add towns, colored by rates per 100,000 for each disease
     addPolygons(
@@ -112,8 +131,9 @@ town_leaflet <- leaflet() %>%
       group = "Federally Recognized Healthcare Centers" 
     ) %>% 
     addLayersControl(
-      overlayGroups = "Median Income",
-                      "Federally Recognized Healthcare Centers"
+      overlayGroups = c("Median Income",
+                        "Percent 65+",
+                        "Federally Recognized Healthcare Centers")
     )
 
 
