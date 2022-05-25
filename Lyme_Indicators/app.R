@@ -9,7 +9,16 @@
 #
 
 library(shiny)
-library(leaflet)
+library(tidyverse) ## dplyr, etc.
+library(dplyr)
+library(magrittr) ## pipes
+library(leaflet) ## For leaflet interactive maps
+library(sf) ## For spatial data
+library(RColorBrewer) ## For colour palettes
+library(htmltools) ## For html
+library(leafsync) ## For placing plots side by side
+library(kableExtra) ## Table output
+library(maptools) ## for reading KML files
 
 
 # Load Data ---------------------------------------------------------------
@@ -36,7 +45,7 @@ rates_town_latlon <- town_latlon_sf %>%
     select(-created_us, -created_da, -last_edite, -last_edi_1) %>% 
     mutate(lyme_popup = paste("<b>", TOWN, "</b>" ,
                               "<br>", "Lyme Cases per 100,000: ", lyme, 
-                              "<br>", "County: ", COUNTY)) 
+                              "<br>", "County: ", town_latlon_sf$COUNTY)) 
 
 
 # Create color palette for each disease - rates ---------------------------
@@ -162,9 +171,10 @@ ui <- fluidPage(
             tabsetPanel(
                 tabPanel("Map", 
                          leafletOutput("mymap")),
-                tabPanel("Table",
-                         tableOutput("table")
-                )
+                tabPanel("Cases",
+                         tableOutput("table")),
+                tabPanel("Health Centers",
+                         tableOutput("health"))
             )
             
         )
@@ -188,18 +198,26 @@ server <- function(input, output, session) {
             )
     })
     output$town <- renderPrint({ input$town })
-    output$table <- function(){ 
-        county_input <- rates_town_latlon$COUNTY[rates_town_latlon$TOWN==input$town]
-        county_rates <- rates %>% 
-          filter(county == county_input) %>% 
-          arrange(desc(lyme))
-        kbl(rates) %>% 
-            kable_material(c("striped", "hover")) %>% 
-            kable_styling(fixed_thead = T, 
-                          bootstrap_options = "striped", 
-                          font_size = 10) %>% 
-            row_spec(which(rates$Location == input$town), color = "white", background = "blue")
+    
+    library(kableExtra)
+   
+    output$table <- renderTable(
+      rates %>% 
+        filter(COUNTY == rates$COUNTY[which(rates$Location == input$town)]) %>% 
+        mutate(Town = Location) %>% 
+        mutate(County = COUNTY) %>% 
+        select(Town, lyme, anaplasmosis, babesiosis, County) %>% 
+        arrange(desc(lyme)) 
+      )
+    
+    # NEEDS FIXING! 
+    output$health <- renderTable(
+      rates %>% 
+        filter(COUNTY == rates$COUNTY[which(rates$Location == input$town)]) %>% 
+        mutate(Town = Location) %>% 
+        mutate(County = COUNTY) %>% 
+        select(Town, lyme, anaplasmosis, babesiosis, County) %>% 
+        arrange(desc(lyme)) 
     }
-}
 
 shinyApp(ui, server)

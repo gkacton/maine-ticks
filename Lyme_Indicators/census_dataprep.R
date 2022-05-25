@@ -93,7 +93,7 @@ elderly_pop <- age_insured %>%
   filter(county != "Maine (total)") %>% 
   right_join(county_latlon_sf, by = c("county" = "COUNTY")) %>% 
   mutate(popup = paste("<b>", county, "</b>",
-                       "<br>", "Percent of population over age 65:", pct_elderly)) %>% 
+                       "<br>", "Percent of population over age 65:", round(pct_elderly, digits = 2))) %>% 
   st_as_sf() 
 
 
