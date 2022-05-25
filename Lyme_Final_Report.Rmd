@@ -32,18 +32,20 @@ library(gapminder)
 library(leaflet)
 
 library(shiny)
+library(sf)
+library(rmapshaper)
 ```
 
 # Executive Summary
-Problem Statement:  
+## Problem Statement  
 In recent years, the reported rates of lyme disease in Maine have been increasing, especially in the midcoast region. As lyme disease can be difficult to diagnose, being able to determine contributing societal factors related to this outbreak is of acute concern to healthcare and epidemiological professionals. Although we can track the dynamics of reported cases, there are a number of reasons why those reported rates may be changing that are not related to the true incidence of disease in the area. From individuals spending more time in their backyards to providers not correctly diagnosing the disease, lurking variables impact our ability to track lyme through the state. Understanding which towns have a greater disease incidence and risk, because of these factors, provides a valuable tool to show lyme researchers where lyme disease diagnosis training could provide the greatest impact.  
 
 
-Proposed Solution:  
+### Proposed Solution  
 In order to parse out the relationship between various sociological behaviors and lyme risk, we created an interactive map of the state with a number of toggle-able layers so that researchers can see those associations. The base layer is a choropleth map that visualizes the number of cases per 100,000 people by town. Individuals can then toggle on three more layers to compare income, age, and locations of conserved lands within the state. Further, pinpointed locations of hospitals and primary care centers can be toggled on and selected in order to get information about healthcare access and provider frequency. This compiled data provides a route to assess the correlation between various regional factors and lyme prevalence.  
 
 
-Final Thoughts and Next Steps:  
+## Final Thoughts and Next Steps  
 While lyme is a difficult disease to track epidemiologically because of difficulties in diagnosing, having an understanding of the other factors at play in infection can be very beneficial in order to better understand the circumstances of individuals contracting it in different areas. We hope that this feature can be built upon to include a number of other toggle-able factors depending on data availability, including but not limited to health insurance prevalence, habitats that suit ticks, and more. Additionally, developing a system to define doctors as “lyme literate” would be beneficial to more specifically categorize the array of hospitals that individuals have access to in different areas. Finally, more up-to-date data about recognized health centers can be added in place of our current set in order to specify regional access more accurately.
 
 # Introduction
@@ -62,6 +64,141 @@ With the original data as well as important notes that helped us understand it, 
 Using data by town is preferred to data by county, because it allows for higher resolution on the map. Because there are more towns than counties the map shows more specifically where the case rates are higher. Passive tick submission data was not useful enough to include on the map, because we are more interested in human behavior than ecological determinants. Though it is important to see where ticks are carrying lyme, the passive tick submission archives are not widespread enough to be reliable.  
 
 To create the shapes of the towns on the map we used GIS data from the state of Maine. This data relates the shape files for each town to the data for those towns. Our map displays information that is directly related to how and why tick borne diseases are so destructive. The impact of tick borne diseases is very dependent on when it is treated. As time passes, symptoms become worse, and the mental, physical, and emotional health of the patient deteriorates. Something that still interests us is where these long term cases are most prevalent and how to increase the lyme literacy of doctors in that region.  
+
+## Preparing Spatial Data
+
+This project relied largely on the `leaflet` and `RShiny` packages, along with assorted helper packages for dealing with spatial data. The spatial data files were available on the Maine State Geolibrary Catalog. These came in the form of `.shp` and `.kml` files, which could be read with the help of the `sf` package. These data had to be converted to the WGS84 datum to be used with `leaflet`, which was accomplished with the `st_transform` function from the `sf` package. Additionally, the `rmapshaper::ms_simplify` function was used to simplify the geometries for both town and county data, in order to decrease the rendering time of our `Shiny` application. 
+
+The following example shows the process by which we cleaned the polygon data to be used for creating `leaflet` map layers with town polygons.
+
+```{r polygon-cleaning, echo=TRUE, eval=FALSE}
+town_latlon <- read_sf("data/spatial_data/towns/towns.shp")
+town_latlon <- town_latlon %>% 
+  st_transform(crs = "WGS84") %>% 
+  rmapshaper::ms_simplify(explode = TRUE, weighting = 0.5)
+```
+
+A similar process was used for the county and conserved lands data, which were also available on the the Maine State Geolibrary Catalog. 
+
+## Utilizing Spatial Data in `Leaflet`
+
+Our partners requested that our final map dashboard have toggle-able layers for different potential indicators of Lyme risk. We decided that the most useful base map for this dashboard would be a choropleth map, in which each town is shaded by its relative case rate, controlled for population. In practice, this was a single layer within a `leaflet` map, which used the `addPolygons` function and mapped `fillColor` and `color` to the lyme rate data for each town. The code for this layer is as follows: 
+
+```{r town-layer, echo=TRUE, eval=FALSE}
+addPolygons(
+        data = rates_town_latlon,
+        group = "Lyme Rates",
+        fillColor = ~lyme_rates_fill_palette(color_values),
+        color = ~lyme_rates_fill_palette(color_values),
+        weight = 1,
+        fillOpacity = 0.5,
+        popup = ~lyme_popup,
+        options = leafletOptions(pane = "rates")
+)
+```
+
+The function `lyme_rates_fill_palette` was defined using `colorNumeric`, and a logarithmic scale of the lyme rates. The logarithmic color scale was necessary due to one extreme outlier, the town of Islesboro. If left as a standard `colorNumeric` gradient, Islesboro would throw the color scale off, and cause all towns with less than 500 cases per 100,000 residents to appear the same color. The palette functions `income_palette` and `age_palette` were also created using `colorNumeric`, but did not require logarithmic scaling, as there were no clear outliers. This is the definition of the `lyme_rates_fill_palette`:
+
+```{r fill-palette, echo=TRUE, eval=FALSE}
+rates <- rates %>% 
+    mutate(color_values = case_when(lyme != 0 ~ log(lyme, base = 1.1),
+                                    lyme == 0 ~ 0) ) %>% 
+    arrange(desc(lyme))
+
+lyme_rates_fill_palette <- colorNumeric(
+    palette = "Blues", 
+    domain = rates$color_values)
+```
+
+Other layers on the `leaflet` map include conservation lands, the median income by county, percent of the county population over age 65, and markers for Federal Health Care Centers. The conservation land and county-level census data also utilize the `addPolygons` feature, while the Health Centers are done using `addMarkers`. Additionally, county boundaries are added via `addPolylines`. 
+
+## Layer Controls and Map Panes
+
+In order to create a map that is both aesthetically pleasing and functional for researchers, we had to think carefully about how to control the visibility of different layers. Ultimately, the county-level census data, which displays potential indicators of Lyme risk, needed to be toggle-able, and should be layered on top of the base Lyme cases map. To execute this vision, we used both `addLayersControl` and `addMapPane` functions. 
+
+The `addMapPane` function allowed us to control which layers would appear on top of other layers. The bottom-most layer would be the conservation land polygons, as that layer would not be turned on and off. The next layer is the base Lyme case rates map, which also is not able to be turned off. County boundaries can be seen on top of the town data. Next, the census data are in the same map pane, and can both be turned off independent of each other. This allows a researcher to view the county-level data and identify an area of interest, then turn off those layers to see the case rate data in detail. Lastly, the Health Center markers are on top as another toggle-able layer. In the `leaflet` definition, this layering is accomplished through manually setting the `zIndex` of each `mapPane`. A higher `zIndex` will make that `mapPane` be displayed on top of those with a lower `zIndex`. 
+
+```{r map-panes, echo=TRUE, eval=FALSE}
+addMapPane("indicators", zIndex = 440) %>% # county-level data
+addMapPane("borders", zIndex = 450) %>% # county borders
+addMapPane("rates", zIndex = 430) %>% # case rates
+addMapPane("conservation", zIndex = 410) # conservation lands
+```
+
+In order to have layers turn on and off, we used the `addLayersControl` function. Each layer is assigned to a group, which is then designated as either a `baseGroup` or `overlayGroup` in the `addLayersControl` function. In our case, we wanted all layers that would be turned off to operate independently, so all three were designated as `overlayGroups`. 
+
+```{r layers, echo=TRUE, eval=FALSE}
+addLayersControl(
+  overlayGroups = c("Median Income",
+                    "Percent 65+",
+                    "Federally Recognized Healthcare Centers")
+    )
+```
+
+## Creating an Interactive Platform
+
+The final step in creating our interactive dashboard was to place this `leaflet` map within an `RShiny` application. The purpose of the `Shiny` app was to allow a researcher to select a town of concern, which would then be highlighted on the map. The second tab would allow the researcher to see all towns in the same county as the selected town, arranged by highest Lyme rate, and the third tab would display all Health Centers within that town. This multi-tab, interactive format was achieved through the `sidebarLayout` and `tabsetPanel` UI functions. The UI for this `Shiny` app is as follows:
+
+```{r shiny-ui, echo=TRUE, eval=FALSE}
+ui <- fluidPage(
+    titlePanel("Lyme Rates per 100,000 Population"
+               ),
+    sidebarLayout(
+        sidebarPanel(
+            h3("Maine Tracking Network Incidence Rate Data, 2016-2020."),
+            selectInput("town", label = h3("Select a Town"), 
+                        choices = rates$Location, 
+                        selected = "Portland")
+        ),
+        mainPanel(
+            tabsetPanel(
+                tabPanel("Map", 
+                         leafletOutput("mymap")),
+                tabPanel("Cases",
+                         h3("Towns in the same county with the highest lyme rates."),
+                         tableOutput("table")),
+                tabPanel("Health Centers",
+                         h3("Federally-Recognized Healthcare Centers in this town."),
+                         tableOutput("health"))
+            )
+            
+        )
+    )
+)   
+```
+
+For interactivity, the server functions all depended on the town input. The first of these was to add an additional `addPolylines` function to the `leaflet` map, which would highlight the desired town in yellow. 
+
+```{r shiny-highlight, echo=TRUE, eval=FALSE}
+output$mymap <- renderLeaflet({
+        town_leaflet %>% 
+            addMapPane("highlight", zIndex = 500) %>% 
+            addPolylines(
+                options = leafletOptions(pane = "highlight"),
+                data = rates_town_latlon %>% filter(TOWN == input$town),
+                color = "yellow",
+                weight = 2,
+                opacity = 1
+            )
+```
+
+
+The next two server chunks each created a table, which changes depending on the value of `input$town`. One determines the county that this town is in, and shows all of the towns within that county. The other behaves similarly, but filters the Federal Health Centers data to only include Health Centers within the desired town. Below, find the code for filtering by the county that `input$town` belongs to:
+
+```{r shiny-table, echo=TRUE, eval=FALSE}
+output$table <- renderTable(
+      rates %>% 
+        filter(COUNTY == rates$COUNTY[which(rates$Location == input$town)]) %>% 
+        mutate(Town = Location) %>% 
+        mutate(County = COUNTY) %>% 
+        select(Town, lyme, anaplasmosis, babesiosis, County) %>% 
+        arrange(desc(lyme)) 
+      )
+```
+
+## Future Code Improvements to Consider
+
+The most attractive potential code improvement to consider for the future of this project would be to convert the existing tables in the `Shiny` app to utilize the `kableExtra` package for interactive HTML formatting. This could allow the user to arrange the data by different variables. For example, they could change from arranging the set by Lyme rates to arranging by Anaplasmosis rates, or view the set from lowest to highest Lyme rate rather than highest to lowest. There was not time to explore this package during the extremely compact 3 week schedule of the course, but it would be a relatively simple add-on that could vastly improve the usability of the dashboard. 
 
 # Results and Discussion
 
