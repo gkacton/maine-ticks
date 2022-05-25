@@ -159,28 +159,31 @@ town_leaflet <- leaflet() %>%
 # define UI ---------------------------------------------------------------
 
 ui <- fluidPage(
-    titlePanel("Lyme Rates per 100,000 Population"),
-    
+    titlePanel("Lyme Rates per 100,000 Population"
+               ),
     sidebarLayout(
         sidebarPanel(
+            h3("Maine Tracking Network Incidence Rate Data, 2016-2020."),
             selectInput("town", label = h3("Select a Town"), 
                         choices = rates$Location, 
-                        selected = "Portland"),
+                        selected = "Portland")
         ),
         mainPanel(
             tabsetPanel(
                 tabPanel("Map", 
                          leafletOutput("mymap")),
                 tabPanel("Cases",
+                         h3("Towns in the same county with the highest lyme rates."),
                          tableOutput("table")),
                 tabPanel("Health Centers",
+                         h3("Federally-Recognized Healthcare Centers in this town."),
                          tableOutput("health"))
             )
             
         )
     )
-    
-)
+)   
+
 
 # define server -----------------------------------------------------------
 
@@ -212,12 +215,18 @@ server <- function(input, output, session) {
     
     # NEEDS FIXING! 
     output$health <- renderTable(
-      rates %>% 
-        filter(COUNTY == rates$COUNTY[which(rates$Location == input$town)]) %>% 
-        mutate(Town = Location) %>% 
-        mutate(County = COUNTY) %>% 
-        select(Town, lyme, anaplasmosis, babesiosis, County) %>% 
-        arrange(desc(lyme)) 
+      fed_health %>% 
+        mutate(County = `County Equivalent Name`) %>% 
+        filter(`Site City` == input$town) %>% 
+        select(`Site Name`,
+               `Site Address`,
+               `Site City`,
+                County,
+               `Site Telephone Number`,
+               `Site Web Address`,
+        ) %>% 
+        arrange(`Site Name`)
+    )
     }
 
 shinyApp(ui, server)
