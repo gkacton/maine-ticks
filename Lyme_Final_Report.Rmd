@@ -1,0 +1,103 @@
+---
+title: "Mapping Primary Care Providers for Lyme Disease Education Outreach"
+author: "Grace Acton, Marco Willen, Shelby Armor, Emily Tamkin"
+date: "Short Term 2022"
+output: 
+  html_document:
+    theme: sandstone
+    highlight: haddock
+    number_sections: TRUE
+    toc: TRUE
+    toc_float: TRUE
+    toc_depth: 1
+    code_download: TRUE
+---
+    
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE) # Step 2 Changing the code chunk settings
+```    
+
+```{r Libraries, echo = FALSE, message = FALSE, warning = FALSE}
+
+# install.packages("tidyverse")
+library(tidyverse)
+
+# install.packages("kableExtra")
+library(kableExtra)
+
+# install.packages("gapminder")
+library(gapminder)
+
+# install.packages("leaflet")
+library(leaflet)
+
+library(shiny)
+```
+
+# Executive Summary
+Problem Statement:  
+In recent years, the reported rates of lyme disease in Maine have been increasing, especially in the midcoast region. As lyme disease can be difficult to diagnose, being able to determine contributing societal factors related to this outbreak is of acute concern to healthcare and epidemiological professionals. Although we can track the dynamics of reported cases, there are a number of reasons why those reported rates may be changing that are not related to the true incidence of disease in the area. From individuals spending more time in their backyards to providers not correctly diagnosing the disease, lurking variables impact our ability to track lyme through the state. Understanding which towns have a greater disease incidence and risk, because of these factors, provides a valuable tool to show lyme researchers where lyme disease diagnosis training could provide the greatest impact.  
+
+
+Proposed Solution:  
+In order to parse out the relationship between various sociological behaviors and lyme risk, we created an interactive map of the state with a number of toggle-able layers so that researchers can see those associations. The base layer is a choropleth map that visualizes the number of cases per 100,000 people by town. Individuals can then toggle on three more layers to compare income, age, and locations of conserved lands within the state. Further, pinpointed locations of hospitals and primary care centers can be toggled on and selected in order to get information about healthcare access and provider frequency. This compiled data provides a route to assess the correlation between various regional factors and lyme prevalence.  
+
+
+Final Thoughts and Next Steps:  
+While lyme is a difficult disease to track epidemiologically because of difficulties in diagnosing, having an understanding of the other factors at play in infection can be very beneficial in order to better understand the circumstances of individuals contracting it in different areas. We hope that this feature can be built upon to include a number of other toggle-able factors depending on data availability, including but not limited to health insurance prevalence, habitats that suit ticks, and more. Additionally, developing a system to define doctors as “lyme literate” would be beneficial to more specifically categorize the array of hospitals that individuals have access to in different areas. Finally, more up-to-date data about recognized health centers can be added in place of our current set in order to specify regional access more accurately.
+
+# Introduction
+  Maine has high rates of tick borne diseases including anaplasmosis, lyme, and babesiosis as it is prime habitat for Ixodes Scapularis, the vector responsible for carrying these bacteria. For this project, we focused on lyme disease because of its increasing prevalence, and because it involves the most reliable data. 70-80% of the time, lyme disease is accompanied by an identifiable bull’s eye rash around the site of the tick bite. The real struggle in diagnosing lyme is the 20-30% of cases that do not have this identifier as other initial symptoms can be difficult to distinguish. Further, providers that are not familiar with lyme disease or see few cases per year are less likely to provide a correct, early diagnosis. If caught early, patients can make a full recovery without lingering symptoms, however, some patients develop Post-Treatment Lyme Disease Syndrome, also known as chronic lyme disease. Symptoms include pain, fatigue, trouble thinking, and increased suicidal thoughts lasting 6 months and more after treatment.  
+
+  Our partner, Maine Medical Center’s Vector-Borne Disease Lab, is interested in finding solutions to lower tick borne disease rates in Maine. This involves tracking and identifying areas in the state where individuals are at higher risk of disease. They relayed to us that many primary care providers could benefit from further educational training on diagnosing lyme. Further, that the strength and trust in primary care providers as well as resources to access health care can affect case rates because of how likely symptomatic individuals are to seek treatment. With these realities in mind, they are working to understand the significance of lyme disease case rates across the state, and how other variables affect this data. Our goal is to create maps to display trends that can guide researchers and the general public about where the risk of lyme is higher, and what healthcare resources exist in those areas. Much of this analysis involves determining reasons for higher case rates in the midcoast region.  
+
+  Our research aim is to create a tool to identify where primary care providers are not meeting the demand, and investigate reasons for demand. There are a number of elements that can affect your likelihood of getting lyme, including proximity to tall grass, time spent outside, if you are checking yourself for ticks, and age. Once contracted, there are many different outcomes in the diagnosis and treatment process based on a range of factors. Those who live in a region with strong primary care providers and who are insured are more likely to be treated and correctly diagnosed. Having trust in the healthcare system is also important because it may take more than one doctor’s visit to be diagnosed. If you are of a population that is less likely to seek healthcare, you will be less likely to be correctly diagnosed and treated for the disease.  
+ 
+  The tool that we created is an RShiny app that has two tabs. One tab is a map that displays case rates per town, median income per county, percentage of county over 65, and health care centers. These layers are toggle-able so that you can visually see intersections of high rates of lyme and other characteristics. The other tab is a table that shows case rates per town as well as the health centers available in that area.
+
+
+# Methodological Approach
+With the original data as well as important notes that helped us understand it, we decided that a map with filters would be most useful for our community partner as well as the greater Maine community. Our map includes filters that indicate higher lyme prevalence. These filters feature allows viewers to compare these indicators to the real case rate data.  
+
+Using data by town is preferred to data by county, because it allows for higher resolution on the map. Because there are more towns than counties the map shows more specifically where the case rates are higher. Passive tick submission data was not useful enough to include on the map, because we are more interested in human behavior than ecological determinants. Though it is important to see where ticks are carrying lyme, the passive tick submission archives are not widespread enough to be reliable.  
+
+To create the shapes of the towns on the map we used GIS data from the state of Maine. This data relates the shape files for each town to the data for those towns. Our map displays information that is directly related to how and why tick borne diseases are so destructive. The impact of tick borne diseases is very dependent on when it is treated. As time passes, symptoms become worse, and the mental, physical, and emotional health of the patient deteriorates. Something that still interests us is where these long term cases are most prevalent and how to increase the lyme literacy of doctors in that region.  
+
+# Results and Discussion
+
+
+# Recomendations and Next Steps
+  Because we were limited in time, there are a number of future directions that could improve the efficacy of this tool. The first limiting issue for us was accuracy and relevancy of our healthcare center data. In making the decision to work with data discovered from a google maps scrape of healthcare providers versus federally recognized centers we had to weigh the importance of data completeness (finding every location that could work with lyme, even if not federally recognized) and data reliability (whether the healthcare centers found were actually adequate for providing treatment). We know that a more reliable arrangement of centers is being developed for use, this data can easily be added to our script in place of the federally recognized centers that we chose to plot. Once that data is cleaned and added to the code, it will replace that map layer.  
+  
+  In that same vein, a consideration of ours while mapping the centers involved the relevancy of a number of the sites in terms of whether or not they were well equipped to diagnose and treat lyme disease. In our research and conversations with community partners we determined that some sites are more “lyme literate” than others, meaning that those doctors may more frequently see and treat lyme, or have been more recently educated about diagnosis and treatment. While urgent care sites and emergency rooms can list on their websites that they are equipped to treat lyme, we don’t have an understanding of whether that information is reliable based upon their true experience with it. Further, we didn’t believe that we were well equipped to make those determinations because of our lack of data and understanding about lyme educational campaigns across the state. If the Vector-Borne Disease Lab were able to survey doctors about how frequently they diagnose and are educated about lyme, or use other sources of similar data to evaluate healthcare sites based upon lyme literacy, those characteristics could be added to the map. Being more specific about how competently healthcare sites could identify and treat the disease would make the map more effective because it would control for lyme hotspots due to provider reliability and emphasize areas where the disease may be going underdiagnosed because of a deficiency on the provider side. Further, sites where individuals are unlikely to go for lyme disease symptoms because of a lack of training or testing capability could be eliminated from the set.  
+  
+  The area with the greatest opportunity for development as we conclude the project is the map layers. The beauty of using interactive software to show trends is that there are infinite possibilities about what data can be added. Now that the baseline code process has been set up, it will be simple to clean new information using the format that we’ve identified and create fresh layers. A roadblock for us was the availability of relevant data. Although we had a number of ideas about various important factors related to contracting lyme disease, there simply was not existing data divided by Maine county or town. We thought that some interesting layers of information could involve health insurance access, outdoor recreational activity participation, and locations of lyme disease educational campaigns.  
+  
+  Because our leaflet is meant to act as a tool for researchers, next steps involve using the information gathered from it to determine which hospitals require further lyme disease training. Evaluating the factors listed in contrast to the baseline lyme case rates allows us to inform our currently-listed health centers that they are possibly underdiagnosing. 
+
+
+# References
+Artiga, S., Orgera, K., & Pham, O. (2020). Disparities in health and health care: Five key questions and answers. Kaiser Family Foundation.
+
+Bisanzio, D., Fernández, M. P., Martello, E., Reithinger, R., & Diuk-Wasser, M. A. (2020). Current and future spatiotemporal patterns of Lyme disease reporting in the Northeastern United States. JAMA network open, 3(3), e200319-e200319.
+
+Dickman, S. L., Woolhandler, S., Bor, J., McCormick, D., Bor, D. H., & Himmelstein, D. U. (2016). Health spending for low-, middle-, and high-income Americans, 1963–2012. Health Affairs, 35(7), 1189-1196.
+
+Eisen, R. J., Piesman, J., Zielinski-Gutierrez, E., & Eisen, L. (2012). What do we need to know about disease ecology to prevent Lyme disease in the northeastern United States?. Journal of medical entomology, 49(1), 11-22.
+
+Elias, S. P., Maasch, K. A., Anderson, N. T., Rand, P. W., Lacombe, E. H., Robich, R. M., ... & Smith Jr, R. P. (2020). Decoupling of blacklegged tick abundance and Lyme disease incidence in Southern Maine, USA. Journal of medical entomology, 57(3), 755-765.
+
+Herrington Jr, J. E., Campbell, G. L., Bailey, R. E., Cartter, M. L., Adams, M., Frazier, E. L., ... & Gensheimer, K. F. (1997). Predisposing factors for individuals' Lyme disease prevention practices: Connecticut, Maine, and Montana. American journal of public health, 87(12), 2035-2038.
+
+Lacout, A., El Hajjam, M., Marcy, P. Y., & Perronne, C. (2018). The persistent Lyme disease:“True chronic Lyme disease” rather than “post-treatment Lyme disease syndrome”. Journal of Global Infectious Diseases, 10(3), 170.
+
+Maine Center for Disease Control and Prevention, Maine Tracking Network. Tick-Related: Near real-time data. Retrieved from https://data.mainepublichealth.gov/tracking/.
+
+Smith Jr, R. P., Rand, P. W., & Lacombe, E. H. (1990). Potential for Lyme disease in Maine: deer survey of distribution of Ixodes dammini, the tick vector. American journal of public health, 80(3), 333-335
+
+State of Maine, Geolibrary Data Catalog. Maine Town and Townships Boundary Polygons (2022) [Data file]. Retrieved from https://www.maine.gov/geolib/catalog.html#boundaries. 
+
+Van Doorslaer, E., Masseria, C., & Koolman, X. (2006). Inequalities in access to medical care by income in developed countries. Cmaj, 174(2), 177-183.
+
+U.S. Census Bureau 2022. SELECTED CHARACTERISTICS OF THE NATIVE AND FOREIGN BORN POPULATIONS. Retrieved from https://data.census.gov/cedsci/. 
+
