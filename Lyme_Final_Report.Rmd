@@ -41,7 +41,7 @@ library(rmapshaper)
 In recent years, the reported rates of lyme disease in Maine have been increasing, especially in the midcoast region. As lyme disease can be difficult to diagnose, being able to determine contributing societal factors related to this outbreak is of acute concern to healthcare and epidemiological professionals. Although we can track the dynamics of reported cases, there are a number of reasons why those reported rates may be changing that are not related to the true incidence of disease in the area. From individuals spending more time in their backyards to providers not correctly diagnosing the disease, lurking variables impact our ability to track lyme through the state. Understanding which towns have a greater disease incidence and risk, because of these factors, provides a valuable tool to show lyme researchers where lyme disease diagnosis training could provide the greatest impact.  
 
 
-### Proposed Solution  
+## Proposed Solution  
 In order to parse out the relationship between various sociological behaviors and lyme risk, we created an interactive map of the state with a number of toggle-able layers so that researchers can see those associations. The base layer is a choropleth map that visualizes the number of cases per 100,000 people by town. Individuals can then toggle on three more layers to compare income, age, and locations of conserved lands within the state. Further, pinpointed locations of hospitals and primary care centers can be toggled on and selected in order to get information about healthcare access and provider frequency. This compiled data provides a route to assess the correlation between various regional factors and lyme prevalence.  
 
 
@@ -59,11 +59,9 @@ While lyme is a difficult disease to track epidemiologically because of difficul
 
 
 # Methodological Approach
-With the original data as well as important notes that helped us understand it, we decided that a map with filters would be most useful for our community partner as well as the greater Maine community. Our map includes filters that indicate higher lyme prevalence. These filters feature allows viewers to compare these indicators to the real case rate data.  
+  Because the independent variable we’re interested in modeling is geography, we decided that a map with filters would be most useful for our community partner to visualize spatial correlations. After much deliberation about factors that could relate to the transmission of lyme disease in certain areas, we determined that we could most reliably track data related to human and provider behavior as opposed to tick locations and behavior. Although it is important to see where ticks are more likely to be carrying lyme, the passive tick submission archives were not extensive enough to be reliable in our mapping software. As such, we used the cases per 100,000 persons data as the base layer of the map.  
 
-Using data by town is preferred to data by county, because it allows for higher resolution on the map. Because there are more towns than counties the map shows more specifically where the case rates are higher. Passive tick submission data was not useful enough to include on the map, because we are more interested in human behavior than ecological determinants. Though it is important to see where ticks are carrying lyme, the passive tick submission archives are not widespread enough to be reliable.  
-
-To create the shapes of the towns on the map we used GIS data from the state of Maine. This data relates the shape files for each town to the data for those towns. Our map displays information that is directly related to how and why tick borne diseases are so destructive. The impact of tick borne diseases is very dependent on when it is treated. As time passes, symptoms become worse, and the mental, physical, and emotional health of the patient deteriorates. Something that still interests us is where these long term cases are most prevalent and how to increase the lyme literacy of doctors in that region.  
+  As we experimented with different mapping strategies, we found that using data by town was more effective than using data by county because it allows for higher resolution of disease prevalence on the map. The greater specificity of town as opposed to county location on the map shows more specifically where the case rates are higher.  
 
 ## Preparing Spatial Data
 
