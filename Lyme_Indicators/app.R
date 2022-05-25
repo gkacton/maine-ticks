@@ -42,10 +42,13 @@ rates <- rates %>%
 
 rates_town_latlon <- town_latlon_sf %>% 
     left_join(rates, by = c("TOWN" = "Location")) %>% 
-    select(-created_us, -created_da, -last_edite, -last_edi_1) %>% 
+    filter(is.na(lyme) == FALSE) %>% 
+    select(-created_us, -created_da, -last_edite, -last_edi_1) 
+
+rates_town_latlon <- rates_town_latlon %>% 
     mutate(lyme_popup = paste("<b>", TOWN, "</b>" ,
                               "<br>", "Lyme Cases per 100,000: ", lyme, 
-                              "<br>", "County: ", town_latlon_sf$COUNTY)) 
+                              "<br>", "County: ", COUNTY.x)) 
 
 
 # Create color palette for each disease - rates ---------------------------
@@ -134,7 +137,7 @@ town_leaflet <- leaflet() %>%
         data = rates_town_latlon,
         group = "Lyme Rates",
         fillColor = ~lyme_rates_fill_palette(color_values),
-        color = ~lyme_rates_fill_palette(color_values),
+        color = "lightskyblue",
         weight = 1,
         fillOpacity = 0.5,
         popup = ~lyme_popup,
